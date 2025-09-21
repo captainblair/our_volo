@@ -1,7 +1,7 @@
+import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from '../components/Sidebar'
 import Topbar from '../components/Topbar'
 import api from '../services/api'
-import { useEffect, useState, useCallback } from 'react'
 import useNotifications from '../hooks/useNotifications'
 
 export default function MessagingPage(){
