@@ -173,7 +173,7 @@ const scrollToSection = (sectionId) => {
       {/* Navigation Bar */}
       <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-40">
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-orange-600">Volo Africa Comm</h1>
+          <h1 className="text-2xl font-bold text-yellow-600">VOLO</h1>
         </div>
         
         <div className="hidden md:flex space-x-8">
@@ -351,8 +351,8 @@ const scrollToSection = (sectionId) => {
       <footer id="contact" className="bg-gray-800 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-orange-500">Volo Africa Comm</h3>
-            <p className="text-gray-400">Streamlining departmental communication for businesses across Africa.</p>
+            <h3 className="text-xl font-semibold mb-4 text-orange-500"> VOLO</h3>
+            <p className="text-gray-400">OWN THE JOURNEY, OWN THE PLATFORM.</p>
           </div>
           
           <div>
@@ -390,8 +390,8 @@ const scrollToSection = (sectionId) => {
             <address className="text-gray-400 not-italic">
               <p>Ngong Road, Nairobi</p>
               <p>Kenya</p>
-              <p>info@voloafrica.com</p>
-              <p>+254 700 000 000</p>
+              <p>info@volo.africa</p>
+              <p>+254 746 821 567</p>
             </address>
           </div>
           
