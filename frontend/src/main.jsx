@@ -5,6 +5,7 @@ import "./index.css";
 
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup"; // Added import for Signup
 import Dashboard from "./pages/Dashboard";
 import TasksPage from "./pages/TasksPage";
 import MessagingPage from "./pages/MessagingPage";
@@ -13,7 +14,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // PrivateRoute Component for protecting routes
 function PrivateRoute({ children }) {
-  const { token } = useAuth();  // Access the token from AuthContext
+  const { token } = useAuth(); // Access the token from AuthContext
   // If token is available, allow the route, otherwise redirect to login
   return token ? children : <Navigate to="/login" />;
 }
@@ -25,6 +26,7 @@ const App = () => (
         {/* Public routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} /> {/* Added route for signup */}
 
         {/* Protected routes */}
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
