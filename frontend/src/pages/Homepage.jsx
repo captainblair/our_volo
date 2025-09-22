@@ -7,7 +7,76 @@ import volovolovolo from "../media/volovolovolo.avif";
 
 
 // Configure your backend API base URL here
-const API_BASE_URL = "http://localhost:5000"; // Replace with your actual backend URL
+const API_BASE_URL = "http://localhost:8000"; // Django backend URL
+
+const handleLogin = async (e, login) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  
+  try {
+    await login(username, password); // Use the login function passed as a parameter
+    setSuccess("Login successful!");
+    setUsername("");
+    setPassword("");
+    setTimeout(() => {
+      setIsLoginModalOpen(false); // Ensure modal closes
+      setSuccess(""); // Clear success message
+      // Redirect to dashboard or protected route (replace with your route)
+      window.location.href = "/dashboard"; // Example redirect
+    }, 2000);
+  } catch (err) {
+    setError(err.message || "An error occurred during login");
+    console.error("Login error:", err);
+  }
+};
+
+const handleSignup = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, username, password, department }),
+    });
+    
+    const responseText = await response.text();
+    console.log("Signup response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/users/` });
+    
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (err) {
+      throw new Error("Invalid JSON response from server");
+    }
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Signup endpoint not found. Please check the backend server and API URL.");
+      }
+      throw new Error(data.message || `Signup failed with status ${response.status}`);
+    }
+    
+    setSuccess("Account created successfully! Please log in.");
+    setName("");
+    setUsername("");
+    setPassword("");
+    setDepartment("");
+    setTimeout(() => {
+      setIsSignupModalOpen(false);
+      setIsLoginModalOpen(true);
+      setSuccess("");
+    }, 2000);
+  } catch (err) {
+    setError(err.message || "An error occurred during signup");
+    console.error("Signup error:", err);
+  }
+};
 
 export default function Homepage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -19,7 +88,7 @@ export default function Homepage() {
   const [activeSection, setActiveSection] = useState("home");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const { setToken } = useAuth();
+  const { login } = useAuth(); // Call useAuth at the top level
 
   const slide = {
     image: volovolovolo,
@@ -28,23 +97,22 @@ export default function Homepage() {
   };
 
   // Smooth scrolling for navigation
-  // Smooth scrolling for navigation
-const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    const offset = 80; // Adjust for navbar height
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
-    
-    // Use a smooth scroll with a slight delay
-    setTimeout(() => {
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth", // Enables smooth scrolling
-      });
-    }, 400); // Introduce a small delay (300ms) for the effect
-  }
-};
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 80; // Adjust for navbar height
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      // Use a smooth scroll with a slight delay
+      setTimeout(() => {
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth", // Enables smooth scrolling
+        });
+      }, 400); // Introduce a small delay (300ms) for the effect
+    }
+  };
 
   // Update active section on scroll
   useEffect(() => {
@@ -76,44 +144,16 @@ const scrollToSection = (sectionId) => {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      
-      // Log response for debugging
-      const responseText = await response.text();
-      console.log("Login response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/login` });
-      
-      let data;
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-      } catch (err) {
-        throw new Error("Invalid JSON response from server");
-      }
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Login endpoint not found. Please check the backend server and API URL.");
-        }
-        throw new Error(data.message || `Login failed with status ${response.status}`);
-      }
-      
-      if (data.token) {
-        setToken(data.token);
-        setSuccess("Login successful!");
-        setUsername("");
-        setPassword("");
-        setTimeout(() => {
-          setIsLoginModalOpen(false);
-          setSuccess("");
-        }, 2000);
-      } else {
-        throw new Error("No token received from server");
-      }
+      await login(username, password); // Use the login function from the top-level destructuring
+      setSuccess("Login successful!");
+      setUsername("");
+      setPassword("");
+      setTimeout(() => {
+        setIsLoginModalOpen(false); // Ensure modal closes
+        setSuccess(""); // Clear success message
+        // Redirect to dashboard or protected route (replace with your route)
+        window.location.href = "/dashboard"; // Example redirect
+      }, 2000);
     } catch (err) {
       setError(err.message || "An error occurred during login");
       console.error("Login error:", err);
@@ -126,7 +166,7 @@ const scrollToSection = (sectionId) => {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE_URL}/api/signup`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,9 +174,8 @@ const scrollToSection = (sectionId) => {
         body: JSON.stringify({ name, username, password, department }),
       });
       
-      // Log response for debugging
       const responseText = await response.text();
-      console.log("Signup response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/signup` });
+      console.log("Signup response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/users/` });
       
       let data;
       try {

@@ -11,8 +11,10 @@ import MessagingPage from "./pages/MessagingPage";
 import AdminPage from "./pages/AdminPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
+// PrivateRoute Component for protecting routes
 function PrivateRoute({ children }) {
-  const { token } = useAuth();
+  const { token } = useAuth();  // Access the token from AuthContext
+  // If token is available, allow the route, otherwise redirect to login
   return token ? children : <Navigate to="/login" />;
 }
 
@@ -34,4 +36,5 @@ const App = () => (
   </AuthProvider>
 );
 
+// Rendering the App
 createRoot(document.getElementById("root")).render(<App />);
