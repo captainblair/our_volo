@@ -1,94 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import videoSource from '../media/11269279-uhd_3840_2160_24fps.mp4';
+import videoSource from "../media/11269279-uhd_3840_2160_24fps.mp4";
 import volovolovolo from "../media/volovolovolo.avif";
+import { useNavigate } from "react-router-dom";
 
-
-
-
-// Configure your backend API base URL here
 const API_BASE_URL = "http://localhost:8000"; // Django backend URL
 
-const handleLogin = async (e, login) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
-  
-  try {
-    await login(username, password); // Use the login function passed as a parameter
-    setSuccess("Login successful!");
-    setUsername("");
-    setPassword("");
-    setTimeout(() => {
-      setIsLoginModalOpen(false); // Ensure modal closes
-      setSuccess(""); // Clear success message
-      // Redirect to dashboard or protected route (replace with your route)
-      window.location.href = "/dashboard"; // Example redirect
-    }, 2000);
-  } catch (err) {
-    setError(err.message || "An error occurred during login");
-    console.error("Login error:", err);
-  }
-};
-
-const handleSignup = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
-  
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/users/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, username, password, department }),
-    });
-    
-    const responseText = await response.text();
-    console.log("Signup response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/users/` });
-    
-    let data;
-    try {
-      data = responseText ? JSON.parse(responseText) : {};
-    } catch (err) {
-      throw new Error("Invalid JSON response from server");
-    }
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("Signup endpoint not found. Please check the backend server and API URL.");
-      }
-      throw new Error(data.message || `Signup failed with status ${response.status}`);
-    }
-    
-    setSuccess("Account created successfully! Please log in.");
-    setName("");
-    setUsername("");
-    setPassword("");
-    setDepartment("");
-    setTimeout(() => {
-      setIsSignupModalOpen(false);
-      setIsLoginModalOpen(true);
-      setSuccess("");
-    }, 2000);
-  } catch (err) {
-    setError(err.message || "An error occurred during signup");
-    console.error("Signup error:", err);
-  }
-};
-
 export default function Homepage() {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [department, setDepartment] = useState("");
   const [activeSection, setActiveSection] = useState("home");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const { login } = useAuth(); // Call useAuth at the top level
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const slide = {
     image: volovolovolo,
@@ -96,32 +17,29 @@ export default function Homepage() {
     description: "Ensure the right tasks reach the right teams with our intelligent assignment system."
   };
 
-  // Smooth scrolling for navigation
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 80; // Adjust for navbar height
+      const offset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
       
-      // Use a smooth scroll with a slight delay
       setTimeout(() => {
         window.scrollTo({
           top: offsetPosition,
-          behavior: "smooth", // Enables smooth scrolling
+          behavior: "smooth",
         });
-      }, 400); // Introduce a small delay (300ms) for the effect
+      }, 400);
     }
   };
 
-  // Update active section on scroll
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'features', 'about', 'contact'];
       const scrollPosition = window.scrollY + 100;
       
       for (const section of sections) {
-        const element = document.getElementById(section);
+        const element = document.getElementId(section);
         if (element) {
           const offsetTop = element.offsetTop;
           const offsetBottom = offsetTop + element.offsetHeight;
@@ -137,75 +55,6 @@ export default function Homepage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    
-    try {
-      await login(username, password); // Use the login function from the top-level destructuring
-      setSuccess("Login successful!");
-      setUsername("");
-      setPassword("");
-      setTimeout(() => {
-        setIsLoginModalOpen(false); // Ensure modal closes
-        setSuccess(""); // Clear success message
-        // Redirect to dashboard or protected route (replace with your route)
-        window.location.href = "/dashboard"; // Example redirect
-      }, 2000);
-    } catch (err) {
-      setError(err.message || "An error occurred during login");
-      console.error("Login error:", err);
-    }
-  };
-
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/users/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, username, password, department }),
-      });
-      
-      const responseText = await response.text();
-      console.log("Signup response:", { status: response.status, text: responseText, url: `${API_BASE_URL}/api/users/` });
-      
-      let data;
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-      } catch (err) {
-        throw new Error("Invalid JSON response from server");
-      }
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Signup endpoint not found. Please check the backend server and API URL.");
-        }
-        throw new Error(data.message || `Signup failed with status ${response.status}`);
-      }
-      
-      setSuccess("Account created successfully! Please log in.");
-      setName("");
-      setUsername("");
-      setPassword("");
-      setDepartment("");
-      setTimeout(() => {
-        setIsSignupModalOpen(false);
-        setIsLoginModalOpen(true);
-        setSuccess("");
-      }, 2000);
-    } catch (err) {
-      setError(err.message || "An error occurred during signup");
-      console.error("Signup error:", err);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -244,13 +93,13 @@ export default function Homepage() {
         
         <div className="flex space-x-4">
           <button 
-            onClick={() => setIsLoginModalOpen(true)}
+            onClick={() => navigate('/login')}
             className="px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
           >
             Login
           </button>
           <button 
-            onClick={() => setIsSignupModalOpen(true)}
+            onClick={() => navigate('/signup')}
             className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
           >
             Sign Up
@@ -273,7 +122,7 @@ export default function Homepage() {
               <p className="text-xl md:text-2xl mb-8">{slide.description}</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
-                  onClick={() => setIsSignupModalOpen(true)}
+                  onClick={() => navigate('/signup')}
                   className="px-8 py-3 bg-orange-600 text-white rounded-lg text-lg font-semibold hover:bg-orange-700 transition-colors"
                 >
                   Get Started
@@ -367,7 +216,7 @@ export default function Homepage() {
       <section id="about" className="relative w-full h-[60vh] overflow-hidden">
         <div className="absolute inset-0">
           <video
-            src={videoSource} // Use the imported video source here
+            src={videoSource}
             autoPlay
             loop
             muted
@@ -384,13 +233,12 @@ export default function Homepage() {
         </div>
       </section>
     </div>
- 
 
       {/* Footer */}
       <footer id="contact" className="bg-gray-800 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-semibold mb-4 text-orange-500"> VOLO</h3>
+            <h3 className="text-xl font-semibold mb-4 text-orange-500">VOLO</h3>
             <p className="text-gray-400">OWN THE JOURNEY, OWN THE PLATFORM.</p>
           </div>
           
@@ -463,192 +311,6 @@ export default function Homepage() {
           <p>&copy; {new Date().getFullYear()} Volo Africa. All rights reserved.</p>
         </div>
       </footer>
-
-      {/* Login Modal */}
-      {isLoginModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">Login to Your Account</h3>
-              <button 
-                onClick={() => setIsLoginModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-center mb-4">{success}</p>}
-            
-            <form onSubmit={handleLogin}>
-              <div className="mb-4">
-                <label htmlFor="login-username" className="block text-gray-700 mb-2">Username or Email</label>
-                <input
-                  type="text"
-                  id="login-username"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="mb-6">
-                <label htmlFor="login-password" className="block text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  id="login-password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                    Remember me
-                  </label>
-                </div>
-                
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-orange-600 hover:text-orange-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
-              >
-                Login
-              </button>
-            </form>
-            
-            <p className="mt-4 text-center text-gray-600">
-              Don't have an account?{" "}
-              <button 
-                onClick={() => {
-                  setIsLoginModalOpen(false);
-                  setIsSignupModalOpen(true);
-                }}
-                className="text-orange-600 hover:underline"
-              >
-                Sign up
-              </button>
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Signup Modal */}
-      {isSignupModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">Create an Account</h3>
-              <button 
-                onClick={() => setIsSignupModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-center mb-4">{success}</p>}
-            
-            <form onSubmit={handleSignup}>
-              <div className="mb-4">
-                <label htmlFor="signup-name" className="block text-gray-700 mb-2">Full Name</label>
-                <input
-                  type="text"
-                  id="signup-name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="mb-4">
-                <label htmlFor="signup-username" className="block text-gray-700 mb-2">Username</label>
-                <input
-                  type="text"
-                  id="signup-username"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="mb-4">
-                <label htmlFor="signup-department" className="block text-gray-700 mb-2">Department</label>
-                <select
-                  id="signup-department"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                >
-                  <option value="">Select Department</option>
-                  <option value="it">IT</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="operations">Operations</option>
-                  <option value="hr">Human Resources</option>
-                  <option value="finance">Finance</option>
-                </select>
-              </div>
-              
-              <div className="mb-6">
-                <label htmlFor="signup-password" className="block text-gray-700 mb-2">Password</label>
-                <input
-                  type="password"
-                  id="signup-password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
-              >
-                Sign Up
-              </button>
-            </form>
-            
-            <p className="mt-4 text-center text-gray-600">
-              Already have an account?{" "}
-              <button 
-                onClick={() => {
-                  setIsSignupModalOpen(false);
-                  setIsLoginModalOpen(true);
-                }}
-                className="text-orange-600 hover:underline"
-              >
-                Login
-              </button>
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
