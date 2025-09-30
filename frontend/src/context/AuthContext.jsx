@@ -27,13 +27,16 @@ export function AuthProvider({children}) {
 
   const login = async (email, password) => {
     try {
-      const res = await api.post('/auth/token/', { username: email, password });
+      const res = await api.post('/auth/token/', { email, password });
       const tk = res.data.access;
       setToken(tk);
       localStorage.setItem('token', tk);
     } catch (err) {
-      console.error('Login failed:', err);
-      throw new Error('Login failed');
+      console.error('Login failed:', err.response?.data || err.message);
+      const errorMessage = err.response?.data?.non_field_errors?.[0] || 
+                          err.response?.data?.detail || 
+                          'Invalid email or password';
+      throw new Error(errorMessage);
     }
   };
 
