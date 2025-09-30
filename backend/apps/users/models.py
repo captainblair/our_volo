@@ -14,10 +14,13 @@ class Department(models.Model):
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     role = models.ForeignKey(Role, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
+    email_confirmed = models.BooleanField(default=False)
 
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return f"{self.username} ({self.email})"

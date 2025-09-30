@@ -22,20 +22,53 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id','username','first_name','last_name','email','role','department','role_id','department_id']
+        fields = ['id','username','first_name','last_name','email','phone_number','role','department','role_id','department_id','email_confirmed']
         read_only_fields = ['id']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
-    role_id = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), source='role')
-    department_id = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), source='department')
+    password_confirmation = serializers.CharField(write_only=True)
+    agree_terms = serializers.BooleanField(write_only=True)
+    subscribe_emails = serializers.BooleanField(write_only=True, required=False, default=True)
+    
     class Meta:
         model = User
-        fields = ['username','email','first_name','last_name','password','role_id','department_id']
+        fields = ['first_name','last_name','email','phone_number','password','password_confirmation','agree_terms','subscribe_emails']
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password_confirmation']:
+            raise serializers.ValidationError("Passwords don't match")
+        
+        if not attrs.get('agree_terms'):
+            raise serializers.ValidationError("You must agree to the terms and conditions")
+        
+        # Password validation
+        password = attrs['password']
+        if len(password) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long")
+        if not any(c.isupper() for c in password):
+            raise serializers.ValidationError("Password must contain at least 1 uppercase letter")
+        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+            raise serializers.ValidationError("Password must contain at least 1 special character")
+        
+        return attrs
 
     def create(self, validated_data):
+        validated_data.pop('password_confirmation')
+        validated_data.pop('agree_terms')
+        validated_data.pop('subscribe_emails')
         password = validated_data.pop('password')
-        user = User(**validated_data)
+        
+        # Generate username from email
+        email = validated_data['email']
+        username = email.split('@')[0]
+        counter = 1
+        original_username = username
+        while User.objects.filter(username=username).exists():
+            username = f"{original_username}{counter}"
+            counter += 1
+        
+        user = User(username=username, **validated_data)
         user.set_password(password)
         user.save()
         return user
