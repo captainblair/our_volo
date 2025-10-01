@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BsList, BsBell, BsSearch, BsChatSquareText } from 'react-icons/bs';
+import { BsList, BsBell, BsSearch, BsChatSquareText, BsSun, BsMoon } from 'react-icons/bs';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Topbar({ onMenuToggle }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount, setNotificationCount] = useState(3); // Example count
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -43,15 +46,40 @@ export default function Topbar({ onMenuToggle }) {
 
         {/* Right side icons */}
         <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500">
+          {/* Theme Toggle */}
+          <button 
+            onClick={toggleTheme}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? (
+              <BsSun className="h-5 w-5" />
+            ) : (
+              <BsMoon className="h-5 w-5" />
+            )}
+          </button>
+          
+          {/* Messages */}
+          <button 
+            onClick={() => window.location.href = '/messages'}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+          >
             <BsChatSquareText className="h-5 w-5" />
             <span className="sr-only">Messages</span>
           </button>
           
-          <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative">
+          {/* Notifications */}
+          <button 
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+            onClick={() => setNotificationCount(0)}
+          >
             <BsBell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+            {notificationCount > 0 && (
+              <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full">
+                {notificationCount > 9 ? '9+' : notificationCount}
+              </span>
+            )}
           </button>
 
           {/* Profile dropdown */}
@@ -62,37 +90,44 @@ export default function Topbar({ onMenuToggle }) {
               id="user-menu"
               aria-haspopup="true"
             >
-              <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
-                {user?.first_name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+              <div className="h-8 w-8 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white font-medium">
+                {user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
               </div>
               <span className="hidden md:inline-block ml-2 text-sm font-medium text-gray-700">
-                {user?.first_name || 'User'}
+                {user?.name || 'User'}
               </span>
             </button>
 
             {isProfileOpen && (
               <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
-                  <a
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  <button
+                    onClick={() => {
+                      navigate('/profile');
+                      setIsProfileOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     role="menuitem"
                   >
                     Your Profile
-                  </a>
-                  <a
-                    href="/settings"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate('/settings');
+                      setIsProfileOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     role="menuitem"
                   >
                     Settings
-                  </a>
+                  </button>
                   <button
                     onClick={() => {
-                      // Handle logout
-                      window.location.href = '/login';
+                      logout();
+                      navigate('/login');
+                      setIsProfileOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700"
                     role="menuitem"
                   >
                     Sign out

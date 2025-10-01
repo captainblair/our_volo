@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
+import { BsPencil, BsCheck2, BsX, BsEnvelope, BsTelephone, BsBuilding } from 'react-icons/bs';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
+  const { theme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -14,7 +17,23 @@ export default function ProfilePage() {
   });
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   const [message, setMessage] = useState({ type: '', text: '' });
+  
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.first_name.trim()) newErrors.first_name = 'First name is required';
+    if (!formData.last_name.trim()) newErrors.last_name = 'Last name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   useEffect(() => {
     // Load user data
@@ -51,41 +70,98 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
     setMessage({ type: '', text: '' });
 
     try {
       const response = await api.put(`/users/${user.id}/`, formData);
       updateUser(response.data);
-      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setMessage({ 
+        type: 'success', 
+        text: 'Profile updated successfully!',
+      });
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
+      const errorMessage = error.response?.data?.detail || 
+                         error.response?.data?.message || 
+                         'Failed to update profile. Please try again.';
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Failed to update profile. Please try again.' 
+        text: errorMessage,
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
+  };
+  
+  const handleCancel = () => {
+    // Reset form to original user data
+    setFormData({
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      department_id: user.department?.id || '',
+    });
+    setErrors({});
+    setIsEditing(false);
   };
 
   if (!user) {
-    return <div>Loading user data...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-card p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          {!isEditing && (
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className={`rounded-xl shadow-card p-6 ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h1 className={`text-2xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              My Profile
+            </h1>
+            <p className={`text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              Manage your personal information and preferences
+            </p>
+          </div>
+          {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md transition-colors"
             >
-              Edit Profile
+              <BsPencil className="text-sm" />
+              <span>Edit Profile</span>
             </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleCancel}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <BsX className="text-lg" />
+                <span>Cancel</span>
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md transition-colors disabled:opacity-70"
+              >
+                <BsCheck2 className="text-lg" />
+                <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -93,13 +169,221 @@ export default function ProfilePage() {
           <div 
             className={`mb-6 p-4 rounded-md ${
               message.type === 'error' 
-                ? 'bg-red-100 text-red-700' 
-                : 'bg-green-100 text-green-700'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' 
+                : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
             }`}
           >
             {message.text}
           </div>
         )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Personal Information */}
+          <div className="space-y-6">
+            <div>
+              <h2 className={`text-lg font-medium mb-4 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
+                Personal Information
+              </h2>
+              
+              <div className="space-y-4">
+                {isEditing ? (
+                  <>
+                    <div>
+                      <label htmlFor="first_name" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        value={formData.first_name}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border rounded-md ${
+                          errors.first_name 
+                            ? 'border-red-500' 
+                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                        }`}
+                        disabled={isSubmitting}
+                      />
+                      {errors.first_name && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.first_name}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="last_name" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        value={formData.last_name}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border rounded-md ${
+                          errors.last_name 
+                            ? 'border-red-500' 
+                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                        }`}
+                        disabled={isSubmitting}
+                      />
+                      {errors.last_name && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.last_name}</p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Full Name</p>
+                      <p className="text-gray-900 dark:text-white font-medium">
+                        {user.first_name} {user.last_name}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <label 
+                    htmlFor="email" 
+                    className={`block text-sm font-medium mb-1 ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    Email Address {isEditing && '*'}
+                  </label>
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`w-full px-3 py-2 border rounded-md ${
+                          errors.email 
+                            ? 'border-red-500' 
+                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                        }`}
+                        disabled={isSubmitting}
+                      />
+                      {errors.email && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center">
+                      <BsEnvelope className="text-gray-400 mr-2" />
+                      <p className="text-gray-900 dark:text-white">{user.email}</p>
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <label 
+                    htmlFor="phone" 
+                    className={`block text-sm font-medium mb-1 ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    Phone Number
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                      disabled={isSubmitting}
+                    />
+                  ) : (
+                    <div className="flex items-center">
+                      <BsTelephone className="text-gray-400 mr-2" />
+                      <p className="text-gray-900 dark:text-white">
+                        {user.phone || 'Not provided'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Department Information */}
+          <div>
+            <h2 className={`text-lg font-medium mb-4 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              Department
+            </h2>
+            
+            <div className="space-y-4">
+              {isEditing ? (
+                <div>
+                  <label 
+                    htmlFor="department_id" 
+                    className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
+                  >
+                    Department
+                  </label>
+                  <select
+                    id="department_id"
+                    name="department_id"
+                    value={formData.department_id}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                    disabled={isLoading || isSubmitting}
+                  >
+                    <option value="">Select a department</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <BsBuilding className="text-gray-400 mr-2" />
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {user.department?.name || 'Not assigned'}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Role Information (Read-only) */}
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
+                <div className="flex items-center mt-1">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    user.role?.toLowerCase() === 'admin' 
+                      ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                  }`}>
+                    {user.role || 'User'}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Account Status */}
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Account Status</p>
+                <div className="flex items-center mt-1">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    Active
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-6">

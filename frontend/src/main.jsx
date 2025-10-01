@@ -7,18 +7,22 @@ import './index.css';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/DashboardNew';
 import TasksPage from './pages/TasksPage';
 import TaskDetailPage from './pages/TaskDetailPage';
 import MessagingPage from './pages/MessagingPage';
-import AdminPage from './pages/AdminPage';
+import AdminPanel from './components/admin/AdminPanel';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import DepartmentsPage from './pages/DepartmentsPage';
+import CalendarPage from './pages/CalendarPage';
+import ReportsPage from './pages/ReportsPage';
 
 // Components
 import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // PrivateRoute Component for protecting routes
 function PrivateRoute() {
@@ -39,7 +43,8 @@ function PublicRoute() {
 
 const App = () => (
   <AuthProvider>
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
       <Routes>
         {/* Public routes */}
         <Route element={<PublicRoute />}>
@@ -58,26 +63,24 @@ const App = () => (
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           
+          {/* Feature pages */}
+          <Route path="/departments" element={<DepartmentsPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          
           {/* Admin routes */}
-          <Route path="/admin" element={<AdminPage />}>
-            <Route path="users" element={<div>Users Management</div>} />
-            <Route path="departments" element={<div>Departments</div>} />
-            <Route path="settings" element={<div>System Settings</div>} />
-          </Route>
+          <Route path="/admin/*" element={<AdminPanel />} />
         </Route>
 
         {/* 404 - Not Found */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   </AuthProvider>
 );
 
 // Rendering the App
 const container = document.getElementById('root');
 const root = createRoot(container);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+root.render(<App />);

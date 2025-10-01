@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+  }
+
+  .dark {
+    --background: 224 71% 16%;
+    --foreground: 213 31% 91%;
+    
+    /* Better contrast for text */
+    color-scheme: dark;
+    --tw-text-opacity: 1;
+    color: rgba(248, 250, 252, var(--tw-text-opacity));
+  }
+  
+  body {
+    @apply bg-white dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors duration-200;
+  }
+  
+  /* Better contrast for cards and containers */
+  .card {
+    @apply bg-white dark:bg-dark-card-bg border border-gray-200 dark:border-dark-border rounded-lg shadow-sm;
+  }
+  
+  /* Better contrast for text elements */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    @apply text-gray-900 dark:text-dark-text;
+  }
+  
+  /* Better contrast for muted/disabled text */
+  .text-muted {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+  
+  /* Better contrast for inputs */
+  input, textarea, select {
+    @apply bg-white dark:bg-dark-bg-secondary border border-gray-300 dark:border-dark-border text-gray-900 dark:text-dark-text rounded-md focus:ring-primary-500 focus:border-primary-500;
+  }
+  
+  /* Better contrast for buttons */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white dark:bg-primary-700 dark:hover:bg-primary-800;
+  }
+  
+  .btn-secondary {
+    @apply bg-white dark:bg-dark-bg-secondary border border-gray-300 dark:border-dark-border text-gray-700 dark:text-dark-text hover:bg-gray-50 dark:hover:bg-dark-bg;
+  }
+}

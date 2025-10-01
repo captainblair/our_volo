@@ -2,6 +2,44 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import axios from 'axios';
 import api from '../services/api';
 
+// Role-based access control constants
+export const ROLES = {
+  ADMIN: 'admin',
+  MANAGER: 'manager',
+  SUPERVISOR: 'supervisor',
+  STAFF: 'staff',
+  USER: 'user'
+};
+
+// Department structure
+export const DEPARTMENTS = {
+  ADMINISTRATION: 'Administration',
+  HR: 'Human Resources',
+  FINANCE: 'Finance',
+  IT: 'Information Technology',
+  OPERATIONS: 'Operations',
+  SALES: 'Sales',
+  MARKETING: 'Marketing'
+};
+
+// Helper function to check user permissions
+const hasPermission = (user, requiredRole) => {
+  if (!user || !user.role) return false;
+  
+  const roleHierarchy = {
+    [ROLES.ADMIN]: 4,
+    [ROLES.MANAGER]: 3,
+    [ROLES.SUPERVISOR]: 2,
+    [ROLES.STAFF]: 1,
+    [ROLES.USER]: 0
+  };
+  
+  const userRoleLevel = roleHierarchy[user.role.toLowerCase()] || 0;
+  const requiredRoleLevel = roleHierarchy[requiredRole.toLowerCase()] || 0;
+  
+  return userRoleLevel >= requiredRoleLevel;
+};
+
 // Create the auth context
 const AuthContext = createContext(null);
 
@@ -13,6 +51,32 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRoles, setUserRoles] = useState([]);
+  const [userDepartments, setUserDepartments] = useState([]);
+  const [permissions, setPermissions] = useState({});
+
+  // Role checking functions
+  const hasRole = (role) => {
+    if (!user) return false;
+    return user.role === role;
+  };
+
+  const hasAnyRole = (roles) => {
+    if (!user) return false;
+    return roles.some(role => user.role === role);
+  };
+
+  const isInDepartment = (departmentId) => {
+    if (!user || !user.departments) return false;
+    return user.departments.some(dept => dept.id === departmentId);
+  };
+
+  const canManageDepartment = (departmentId) => {
+    if (!user) return false;
+    if (hasRole(ROLES.ADMIN)) return true;
+    if (!user.managedDepartments) return false;
+    return user.managedDepartments.some(dept => dept.id === departmentId);
+  };
 
   // Fetch user data when token changes
   useEffect(() => {
@@ -20,8 +84,36 @@ export function AuthProvider({ children }) {
       if (token) {
         try {
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          const response = await api.get('/users/me/');
-          setUser(response.data);
+          
+          // Fetch user data
+          const [userResponse, rolesResponse, departmentsResponse] = await Promise.all([
+            api.get('/users/me/'),
+            api.get('/users/roles/'),
+            api.get('/departments/')
+          ]);
+          
+          const userData = userResponse.data;
+          setUser(userData);
+          setUserRoles(rolesResponse.data || []);
+          
+          // Filter departments based on user's access
+          const userDepts = departmentsResponse.data.filter(dept => 
+            dept.members?.some(member => member.id === userData.id) ||
+            dept.managers?.some(manager => manager.id === userData.id)
+          );
+          setUserDepartments(userDepts);
+          
+          // Set permissions based on role
+          setPermissions({
+            canManageUsers: hasPermission(userData, ROLES.ADMIN) || hasPermission(userData, ROLES.MANAGER),
+            canManageDepartments: hasPermission(userData, ROLES.ADMIN) || hasPermission(userData, ROLES.HR),
+            canViewReports: hasPermission(userData, ROLES.ADMIN) || 
+                           hasPermission(userData, ROLES.MANAGER) || 
+                           hasPermission(userData, ROLES.SUPERVISOR),
+            canManageTasks: true, // All users can manage their own tasks
+            canManageAllTasks: hasPermission(userData, ROLES.ADMIN) || hasPermission(userData, ROLES.MANAGER)
+          });
+          
           setError(null);
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -145,9 +237,16 @@ export function AuthProvider({ children }) {
     loading,
     error,
     login,
-    logout,
     updateUser,
-    isAuthenticated: !!token,
+    roles: userRoles,
+    departments: userDepartments,
+    permissions,
+    hasRole,
+    hasAnyRole,
+    isInDepartment,
+    canManageDepartment,
+    ROLES,
+    DEPARTMENTS
   };
 
   return (

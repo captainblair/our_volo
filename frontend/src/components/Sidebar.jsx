@@ -1,111 +1,232 @@
-import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { BsGrid, BsListTask, BsChatDots, BsGear, BsBoxArrowRight, BsPerson } from 'react-icons/bs';
+import { useTheme } from '../context/ThemeContext';
+import { 
+  BsGrid, 
+  BsListTask, 
+  BsChatDots, 
+  BsGear, 
+  BsPerson,
+  BsHouseDoor,
+  BsPeople,
+  BsCalendarEvent,
+  BsFileText,
+  BsEnvelope,
+  BsBoxArrowRight
+} from 'react-icons/bs';
+// Using BsBoxArrowRight from react-icons/bs instead of FiLogOut
 
-const NavItem = ({ to, icon, label, isActive, onClick }) => (
-  <li>
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors ${
-        isActive
-          ? 'bg-primary text-white'
-          : 'text-gray-700 hover:bg-gray-100'
-      }`}
-    >
-      <span className="mr-3">{icon}</span>
-      <span className="font-medium">{label}</span>
-    </button>
-  </li>
-);
+const NavItem = ({ to, icon, label, badge, isActive, onClick, className = '' }) => {
+  const navigate = useNavigate();
+  const { theme } = useTheme();
+  
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (onClick) {
+      onClick();
+    } else if (to) {
+      navigate(to);
+    }
+  };
+  
+  return (
+    <li>
+      <a
+        href={to || '#'}
+        onClick={handleClick}
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-left ${
+          isActive
+            ? 'bg-primary-600 text-white'
+            : `text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 ${className}`
+        }`}
+      >
+        <div className="flex items-center">
+          <span className="mr-3 flex-shrink-0">{icon}</span>
+          <span className="font-medium text-sm">{label}</span>
+        </div>
+        {badge && (
+          <span className="inline-flex items-center justify-center px-2 py-0.5 ml-3 text-xs font-medium rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+            {badge}
+          </span>
+        )}
+      </a>
+    </li>
+  );
+};
 
 export default function Sidebar() {
   const { pathname } = useLocation();
   const { user, logout } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [activePath, setActivePath] = useState(pathname);
+
+  // Update active path when route changes
+  useEffect(() => {
+    setActivePath(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    // Check if user has admin role
+    if (user?.role?.name === 'admin' || user?.role === 'admin') {
+      setIsAdmin(true);
+    }
+  }, [user]);
 
   const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: <BsGrid className="text-xl" /> },
-    { to: '/tasks', label: 'Tasks', icon: <BsListTask className="text-xl" /> },
-    { to: '/messages', label: 'Messages', icon: <BsChatDots className="text-xl" /> },
+    { 
+      to: '/dashboard', 
+      label: 'Dashboard', 
+      icon: <BsGrid className="text-lg" />,
+      exact: true
+    },
+    { 
+      to: '/tasks', 
+      label: 'Tasks', 
+      icon: <BsListTask className="text-lg" />,
+      exact: false
+    },
+    { 
+      to: '/messages', 
+      label: 'Messages', 
+      icon: <BsChatDots className="text-lg" />,
+      exact: false
+    },
+    { 
+      to: '/departments', 
+      label: 'Departments', 
+      icon: <BsPeople className="text-lg" />,
+      exact: true
+    },
+    { 
+      to: '/calendar', 
+      label: 'Calendar', 
+      icon: <BsCalendarEvent className="text-lg" />,
+      exact: true
+    },
+    { 
+      to: '/reports', 
+      label: 'Reports', 
+      icon: <BsFileText className="text-lg" />,
+      exact: true
+    }
   ];
 
   // Add admin link if user is admin
-  if (user?.role?.name === 'admin') {
-    navItems.push({ to: '/admin', label: 'Admin Panel', icon: <BsGear className="text-xl" /> });
+  if (isAdmin) {
+    navItems.push({ 
+      to: '/admin', 
+      label: 'Admin Panel', 
+      icon: <BsGear className="text-lg" />,
+      exact: false
+    });
   }
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const isActive = (to, exact = false) => {
+    if (exact) {
+      return activePath === to;
+    }
+    return activePath.startsWith(to) && (to !== '/' || activePath === '/');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
-    <aside className="w-64 bg-white h-screen flex flex-col border-r border-gray-200">
+    <aside className={`w-64 h-full flex flex-col border-r transition-colors duration-200 ${
+      theme === 'dark' 
+        ? 'bg-gray-800 border-gray-700' 
+        : 'bg-white border-gray-200'
+    }`}>
+      {/* Logo/Brand */}
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-primary">Volo Africa</h1>
-        <p className="text-sm text-gray-500">Departmental Communication System</p>
-      </div>
-      
-      <div className="flex-1 px-4 py-2 overflow-y-auto">
-        <nav>
-          <ul className="space-y-2">
+        <div className="flex items-center">
+          <div className={`w-8 h-8 rounded-md flex items-center justify-center mr-3 ${
+            theme === 'dark' ? 'bg-primary-700' : 'bg-primary-600'
+          }`}>
+            <BsHouseDoor className="text-white text-lg" />
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Volo Africa</h1>
+        </div>
+        
+        {/* Main Navigation */}
+        <nav className="mt-8">
+          <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+            Navigation
+          </h3>
+          <ul className="space-y-1">
             {navItems.map((item) => (
               <NavItem
                 key={item.to}
                 to={item.to}
                 icon={item.icon}
                 label={item.label}
-                isActive={pathname === item.to}
-                onClick={() => navigate(item.to)}
+                isActive={isActive(item.to, item.exact)}
+                className="mb-1"
               />
             ))}
           </ul>
-          
-          <div className="mt-8 pt-4 border-t border-gray-100">
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Account
-            </h3>
-            <ul className="space-y-2">
-              <NavItem
-                to="/profile"
-                icon="👤"
-                label="My Profile"
-                isActive={pathname === '/profile'}
-                onClick={() => navigate('/profile')}
-              />
-              <NavItem
-                to="/settings"
-                icon="⚙️"
-                label="Settings"
-                isActive={pathname === '/settings'}
-                onClick={() => navigate('/settings')}
-              />
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <span className="mr-3 text-xl">🚪</span>
-                  <span className="font-medium">Logout</span>
-                </button>
-              </li>
-            </ul>
-          </div>
         </nav>
+        
+        {/* Account Section */}
+        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+            Account
+          </h3>
+          <ul className="space-y-1">
+            <NavItem
+              to="/profile"
+              icon={<BsPerson className="text-lg" />}
+              label="My Profile"
+              isActive={isActive('/profile', true)}
+            />
+            <NavItem
+              to="/settings"
+              icon={<BsGear className="text-lg" />}
+              label="Settings"
+              isActive={isActive('/settings', true)}
+            />
+            <NavItem
+              onClick={handleLogout}
+              icon={<BsBoxArrowRight className="text-lg" />}
+              label="Logout"
+                className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+              />
+          </ul>
+        </div>
       </div>
       
-      <div className="p-4 border-t border-gray-200">
+      {/* User Profile */}
+      <div className={`p-4 border-t ${
+        theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+      }`}>
         {user && (
           <div className="flex items-center">
-            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
-              {user.first_name?.[0] || user.email[0].toUpperCase()}
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold text-white ${
+              theme === 'dark' ? 'bg-primary-700' : 'bg-primary-600'
+            } text-white`}>
+              {user.name?.[0] || user.email?.[0]?.toUpperCase() || 'U'}
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">
-                {user.first_name || 'User'}
+            <div className="ml-3 min-w-0">
+              <p className={`text-sm font-medium truncate ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
+                {user.name || user.email?.split('@')[0] || 'User'}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {user.role?.name || user.role || 'User'}
+              </p>
+              <p className={`text-xs truncate ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 {user.role?.name || 'User'} • {user.department?.name || 'No Department'}
               </p>
             </div>

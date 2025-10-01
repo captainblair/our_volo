@@ -42,8 +42,8 @@ export default function Login() {
       <div className="w-full md:w-1/2 p-8 flex items-center justify-center">
         <div className="text-center max-w-md">
           <h1 className="text-5xl font-bold mb-4 text-yellow-400">VOLO</h1>
-          <p className="text-lg mb-6">Unlock a world of efficient task management and seamless communication with VOLO.</p>
-          <p className="text-md">Step into a platform designed to empower your team and drive success.</p>
+          <p className="text-lg mb-4 text-white">Unlock a world of efficient task management and seamless communication with VOLO.</p>
+          <p className="text-md text-gray-100">Step into a platform designed to empower your team and drive success.</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default function Login() {
               <input
                 id="email"
                 type="email"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -71,7 +71,7 @@ export default function Login() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 text-gray-900" // Updated text color
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 text-gray-900 bg-white"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -79,7 +79,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={toggleShowPassword}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-900"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-900 bg-transparent"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -94,13 +94,13 @@ export default function Login() {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
-                <label htmlFor="remember_me" className="ml-2 text-sm text-gray-700">Remember me</label>
+                <label htmlFor="remember_me" className="ml-2 text-sm text-gray-800">Remember me</label>
               </div>
               <div className="flex flex-col items-end space-y-1">
                 <button
                   type="button"
                   onClick={() => alert('Forgot password feature coming soon!')}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
                   Forgot password?
                 </button>
@@ -120,11 +120,11 @@ export default function Login() {
             >
               {loading ? "Logging in..." : "Sign In"}
             </button>
-            <p className="text-sm text-gray-700 text-center">
+            <p className="text-sm text-gray-800 text-center">
               Don’t have an account?{" "}
               <button
                 onClick={() => navigate("/signup")}
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 Sign up
               </button>

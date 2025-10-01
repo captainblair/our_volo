@@ -85,22 +85,22 @@ export default function Signup() {
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
-    <div className="min-h-screen flex items-stretch bg-gray-100" style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="absolute inset-0 bg-black bg-opacity-40 z-0"></div>
+    <div className="h-screen flex items-stretch bg-gray-100" style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+      <div className="absolute inset-0 bg-black/60 z-0"></div>
       
       <div className="w-full md:w-1/2 p-6 flex items-center justify-start z-10">
-        <form onSubmit={handleSignup} className="bg-white bg-opacity-95 p-6 rounded-2xl shadow w-full max-w-md space-y-4 max-h-screen overflow-y-auto">
-          <h1 className="text-xl font-semibold text-center">Create an Account</h1>
-          <p className="text-sm text-gray-600 text-center">
-            Please create an account using your official names. The name you enter here will appear on your certificate upon completion.
+        <form onSubmit={handleSignup} className="bg-white bg-opacity-95 p-3 rounded-2xl shadow w-full max-w-md text-sm">
+          <h1 className="text-lg font-bold text-center text-gray-800 mb-0.5">Create Account</h1>
+          <p className="text-xs text-gray-600 text-center mb-3">
+            Use your official name for certificate
           </p>
           
           {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</div>}
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">First Name</label>
             <input
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
               placeholder="Enter your first name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -109,9 +109,9 @@ export default function Signup() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Last Name</label>
             <input
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
               placeholder="Enter your last name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -120,34 +120,34 @@ export default function Signup() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
             <input
               type="email"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <div className="flex items-center mt-2">
+            <div className="flex items-start mt-0.5">
               <input
                 id="subscribe_emails"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-2.5 w-2.5 mt-0.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 checked={subscribeEmails}
                 onChange={(e) => setSubscribeEmails(e.target.checked)}
               />
-              <label htmlFor="subscribe_emails" className="ml-2 text-sm text-gray-600">
-                I confirm my subscription to receive program-related emails.
+              <label htmlFor="subscribe_emails" className="ml-1.5 text-xs text-gray-600 leading-tight">
+                Subscribe to program emails
               </label>
             </div>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Phone Number</label>
             <input
               type="tel"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
               placeholder="+1 (201) 555-0123"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -156,11 +156,11 @@ export default function Signup() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -169,22 +169,22 @@ export default function Signup() {
               <button
                 type="button"
                 onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-800"
+                className="absolute inset-y-0 right-0 flex items-center pr-2 text-xs text-gray-500 hover:text-gray-700 bg-transparent"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Your password should be at least 8 characters long with at least 1 uppercase letter and 1 special character.
+            <p className="text-xs text-gray-600 mt-0.5">
+              Min 8 chars, 1 uppercase, 1 special char
             </p>
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password Confirmation</label>
+            <label className="block text-xs font-medium text-gray-700 mb-0.5">Password Confirmation</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 h-8"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -193,48 +193,41 @@ export default function Signup() {
               <button
                 type="button"
                 onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-800"
+                className="absolute inset-y-0 right-0 flex items-center pr-2 text-xs text-gray-500 hover:text-gray-700 bg-transparent"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
           
-          <div className="flex items-start">
+          <div className="flex items-start mt-0.5">
             <input
-              id="agree_terms"
+              id="terms"
               type="checkbox"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+              className="h-2.5 w-2.5 mt-0.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               checked={agreeTerms}
               onChange={(e) => setAgreeTerms(e.target.checked)}
               required
             />
-            <label htmlFor="agree_terms" className="ml-2 text-sm text-gray-600">
-              I have read and agree to the{" "}
-              <button
-                type="button"
-                onClick={() => alert('Terms and conditions coming soon!')}
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                terms and conditions
-              </button>
+            <label htmlFor="terms" className="ml-1.5 block text-xs text-gray-600 leading-tight">
+              I agree to <a href="#" className="text-blue-600 hover:text-blue-800">terms</a>
             </label>
           </div>
           
           <button 
             type="submit"
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition-colors disabled:opacity-50" 
+            className="w-full bg-black text-white py-1 text-xs rounded hover:bg-gray-800 transition-colors disabled:opacity-50 mt-1 h-8" 
             disabled={loading}
           >
-            {loading ? "Creating Account..." : "Sign Up"}
+            {loading ? "Creating..." : "Sign Up"}
           </button>
           
-          <p className="text-sm text-gray-600 text-center">
-            Already have an account?{" "}
+          <p className="text-xs text-gray-600 text-center mt-2">
+            Have an account?{" "}
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:text-blue-800 font-medium text-xs"
             >
               Login
             </button>
@@ -243,11 +236,16 @@ export default function Signup() {
       </div>
 
       <div className="w-full md:w-1/2 p-6 flex items-center justify-center z-10">
-        <div className="text-white text-center md:text-left max-w-lg">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Welcome to VOLO</h2>
-          <p className="text-lg md:text-xl">
-            Enjoy flexible schedules, lower commissions, 24/7 support, and, most importantly, your share in VOLO's profits through the point-based system!
-          </p>
+        <div className="text-center md:text-left max-w-lg bg-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-yellow-400">Welcome to VOLO</h2>
+          <div className="space-y-4">
+            <p className="text-xl text-white font-medium leading-relaxed">
+              Enjoy flexible schedules, lower commissions, 24/7 support, and, most importantly, your share in VOLO's profits through the point-based system!
+            </p>
+            <p className="text-lg text-gray-200 leading-relaxed">
+              Unlock a world of efficient task management and seamless communication with VOLO. Step into a platform designed to empower your team and drive success.
+            </p>
+          </div>
         </div>
       </div>
     </div>
