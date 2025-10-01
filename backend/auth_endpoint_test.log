@@ -1,0 +1,24 @@
+2025-10-01 04:50:18,896 - __main__ - INFO - 
+=== Testing login with form data ===
+2025-10-01 04:50:18,905 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-10-01 04:50:24,328 - urllib3.connectionpool - DEBUG - http://localhost:8000 "POST /api/auth/token/ HTTP/1.1" 200 726
+2025-10-01 04:50:24,330 - __main__ - INFO - Status code: 200
+2025-10-01 04:50:24,332 - __main__ - INFO - Response: {
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2OTgyNCwiaWF0IjoxNzU5MjgzNDI0LCJqdGkiOiJhMzQyNzQwMTFlY2U0ZWZmOTdiNGI1NzBkY2JmYzYwMiIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.TLlU3W7MYtnnRT5Bvw74zbFnACbvdPr3CtdE_bqwm9E",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5Mjg3MDI0LCJpYXQiOjE3NTkyODM0MjQsImp0aSI6ImE3OWEzMjQyNzYyMDRjNDdhMmJjZTRmMDM2OTU3MTA1IiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.JX6DV_kWW7Q9ya7pPzJuwr2loI_uzQ8hil2iqlTPaeg",
+  "user_id": 1,
+  "email": "test@volo.africa",
+  "username": "testuser"
+}
+2025-10-01 04:50:24,339 - __main__ - INFO - 
+=== Testing login with JSON data ===
+2025-10-01 04:50:24,361 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-10-01 04:50:27,894 - urllib3.connectionpool - DEBUG - http://localhost:8000 "POST /api/auth/token/ HTTP/1.1" 200 726
+2025-10-01 04:50:27,896 - __main__ - INFO - Status code: 200
+2025-10-01 04:50:27,896 - __main__ - INFO - Response: {
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2OTgyNywiaWF0IjoxNzU5MjgzNDI3LCJqdGkiOiJiNTA5NjczNzYyNmE0YjEwYjI0ZjcyOTRlODAwNGUxMiIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.ap2jpoutrAyy5h4RQRfUtspqCmKIjUXmLLJdTqBJUfU",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5Mjg3MDI3LCJpYXQiOjE3NTkyODM0MjcsImp0aSI6ImIwYTgxY2IwMTU1MDRkNmM4MmZhYTc0NjE5MjFkMDA5IiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.yWBIDZPMWdA-0XWAP4rwyJFmrr-GIk_ekEvorIVWktg",
+  "user_id": 1,
+  "email": "test@volo.africa",
+  "username": "testuser"
+}

@@ -1,0 +1,36 @@
+2025-10-01 03:55:27,390 - __main__ - INFO - Logging to file: C:\Users\ADMIN\Downloads\our_volo\backend\auth_test_fixed.log
+2025-10-01 03:55:27,456 - django.db.backends - DEBUG - (0.001) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+2025-10-01 03:55:27,460 - django.db.backends - DEBUG - (0.001) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+2025-10-01 03:55:27,477 - django.db.backends - DEBUG - (0.009) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:55:29,859 - __main__ - INFO - Testing authentication flow for user: test@volo.africa
+2025-10-01 03:55:29,859 - __main__ - INFO - 
+=== Test 1: Get tokens with email/password ===
+2025-10-01 03:55:32,694 - django.db.backends - DEBUG - (0.004) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:55:32,718 - django.db.backends - DEBUG - (0.002) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:55:34,823 - __main__ - INFO - Status code: 200
+2025-10-01 03:55:34,823 - __main__ - INFO - Successfully obtained tokens!
+2025-10-01 03:55:34,824 - __main__ - INFO - Access token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90e...
+2025-10-01 03:55:34,824 - __main__ - INFO - Refresh token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90e...
+2025-10-01 03:55:34,825 - __main__ - INFO - 
+Access token claims:
+2025-10-01 03:55:34,826 - __main__ - INFO -   token_type: access
+2025-10-01 03:55:34,826 - __main__ - INFO -   exp: 1759283734
+2025-10-01 03:55:34,827 - __main__ - INFO -   iat: 1759280134
+2025-10-01 03:55:34,827 - __main__ - INFO -   jti: 69a796e798db41698fe06189afbb6812
+2025-10-01 03:55:34,828 - __main__ - INFO -   user_id: 1
+2025-10-01 03:55:34,828 - __main__ - INFO -   email: test@volo.africa
+2025-10-01 03:55:34,828 - __main__ - INFO -   first_name: Test
+2025-10-01 03:55:34,829 - __main__ - INFO -   last_name: User
+2025-10-01 03:55:34,830 - __main__ - INFO -   username: testuser
+2025-10-01 03:55:34,830 - __main__ - INFO -   type: access
+2025-10-01 03:55:34,831 - __main__ - INFO - 
+=== Test 2: Access protected endpoint ===
+2025-10-01 03:55:34,864 - __main__ - INFO - Status code: 404
+2025-10-01 03:55:34,864 - __main__ - ERROR - Failed to access protected endpoint: b'<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta http-equiv="content-type" content="text/html; charset=utf-8">\n  <title>Page not found at /api/auth/user/</title>\n  <meta name="robots" content="NONE,NOARCHIVE">\n  <style type="text/css">\n    html * { padding:0; margin:0; }\n    body * { padding:10px 20px; }\n    body * * { padding:0; }\n    body { font:small sans-serif; background:#eee; color:#000; }\n    body>div { border-bottom:1px solid #ddd; }\n    h1 { font-weight:normal; margin-bottom:.4em; }\n    h1 span { font-size:60%; color:#666; font-weight:normal; }\n    table { border:none; border-collapse: collapse; width:100%; }\n    td, th { vertical-align:top; padding:2px 3px; }\n    th { width:12em; text-align:right; color:#666; padding-right:.5em; }\n    #info { background:#f6f6f6; }\n    #info ol { margin: 0.5em 4em; }\n    #info ol li { font-family: monospace; }\n    #summary { background: #ffc; }\n    #explanation { background:#eee; border-bottom: 0px none; }\n    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }\n  </style>\n</head>\n<body>\n  <div id="summary">\n    <h1>Page not found <span>(404)</span></h1>\n    \n    <table class="meta">\n      <tr>\n        <th>Request Method:</th>\n        <td>GET</td>\n      </tr>\n      <tr>\n        <th>Request URL:</th>\n        <td>http://localhost/api/auth/user/</td>\n      </tr>\n      \n    </table>\n  </div>\n  <div id="info">\n    \n      <p>\n      Using the URLconf defined in <code>volo_africa.urls</code>,\n      Django tried these URL patterns, in this order:\n      </p>\n      <ol>\n        \n          <li>\n            \n                admin/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/auth/token/\n                [name=\'token_obtain_pair\']\n            \n          </li>\n        \n          <li>\n            \n                api/auth/token/refresh/\n                [name=\'token_refresh\']\n            \n          </li>\n        \n          <li>\n            \n                api/users/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/departments/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/tasks/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/messaging/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/notifications/\n                \n            \n          </li>\n        \n          <li>\n            \n                api/adminpanel/\n                \n            \n          </li>\n        \n      </ol>\n      <p>\n        \n          The current path, <code>api/auth/user/</code>,\n        \n        didn\xe2\x80\x99t match any of these.\n      </p>\n    \n  </div>\n\n  <div id="explanation">\n    <p>\n      You\xe2\x80\x99re seeing this error because you have <code>DEBUG = True</code> in\n      your Django settings file. Change that to <code>False</code>, and Django\n      will display a standard 404 page.\n    </p>\n  </div>\n</body>\n</html>\n'

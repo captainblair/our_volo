@@ -1,0 +1,50 @@
+2025-10-01 03:50:30,213 - django.db.backends - DEBUG - (0.001) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+2025-10-01 03:50:30,217 - django.db.backends - DEBUG - (0.000) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+2025-10-01 03:50:30,220 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:31,228 - __main__ - INFO - Testing authentication for user: test@volo.africa
+2025-10-01 03:50:31,229 - __main__ - INFO - 
+Test 1: Login with form data
+2025-10-01 03:50:32,926 - __main__ - INFO - Status code: 400
+2025-10-01 03:50:32,927 - __main__ - INFO - Response: {'email': ['This field is required.'], 'password': ['This field is required.']}
+2025-10-01 03:50:32,928 - __main__ - INFO - 
+Test 2: Login with JSON data
+2025-10-01 03:50:32,937 - django.db.backends - DEBUG - (0.002) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:32,950 - django.db.backends - DEBUG - (0.003) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:34,388 - __main__ - INFO - Status code: 200
+2025-10-01 03:50:34,388 - __main__ - INFO - Response: {'refresh': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2NjIzNCwiaWF0IjoxNzU5Mjc5ODM0LCJqdGkiOiI4OWRhODA1M2M0MmU0NTZhYWVmNTM0MDcwZTc4YmRhNCIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.Kp-k305Ji02LMCa-W_ynggInc1c1e-hb2VdudAsjVmQ', 'access': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MjgzNDM0LCJpYXQiOjE3NTkyNzk4MzQsImp0aSI6IjZjM2ExMzIxZmFmMzQxOTliYzc5YWNjMjQ0MDA1N2VkIiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.yR1QQwcLycycp0wvgsLJAJqfSfoyauH2tvmqFN836PA', 'user_id': 1, 'email': 'test@volo.africa', 'username': 'testuser'}
+2025-10-01 03:50:34,389 - __main__ - INFO - 
+Test 3: Get user info with token
+2025-10-01 03:50:34,423 - __main__ - INFO - Status code: 404
+2025-10-01 03:50:54,842 - django.db.backends - DEBUG - (0.001) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+2025-10-01 03:50:54,844 - django.db.backends - DEBUG - (0.000) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+2025-10-01 03:50:54,846 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:56,052 - __main__ - INFO - Testing authentication for user: test@volo.africa
+2025-10-01 03:50:56,052 - __main__ - INFO - 
+Test 1: Login with form data
+2025-10-01 03:50:57,318 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:57,326 - django.db.backends - DEBUG - (0.002) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:58,261 - __main__ - INFO - Status code: 200
+2025-10-01 03:50:58,262 - __main__ - INFO - Response: {'refresh': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2NjI1OCwiaWF0IjoxNzU5Mjc5ODU4LCJqdGkiOiI4OWFhOTg4YzQ3Yzc0YWIzYjZjNWNhMzA1N2Y2NmE2ZSIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.SRy00OI1hZyogP-Y3l6dCPJVlaJPwNa43tlP-enQTs0', 'access': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MjgzNDU4LCJpYXQiOjE3NTkyNzk4NTgsImp0aSI6IjliOTdhOWMzZjhjZTQwN2RhNGVmNTIzMjRmNWM0NmVhIiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.ZnOgk6WmUaXARkWeT2dOlNjn4w-awtHdkKKQWUBQWZ4', 'user_id': 1, 'email': 'test@volo.africa', 'username': 'testuser'}
+2025-10-01 03:50:58,262 - __main__ - INFO - 
+Test 2: Login with JSON data
+2025-10-01 03:50:58,266 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:58,272 - django.db.backends - DEBUG - (0.002) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:50:59,250 - __main__ - INFO - Status code: 200
+2025-10-01 03:50:59,250 - __main__ - INFO - Response: {'refresh': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2NjI1OSwiaWF0IjoxNzU5Mjc5ODU5LCJqdGkiOiJkMzQ0MDY5NDAyZTI0NjFlOTJiNGYzYjFkODkyNWI4OCIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.xHjGzx_IvysbG61XoPVvUZVnmVuvO3UqBoPrED6d4jc', 'access': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MjgzNDU5LCJpYXQiOjE3NTkyNzk4NTksImp0aSI6IjY2NzE1YmNkYWUwZDRkZTQ5MTgyNDk1OWQxNzUxYTBiIiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.e29S6OgZd1Zo8EKiGsTrl791VfilxE1bIokmKB_Zt-8', 'user_id': 1, 'email': 'test@volo.africa', 'username': 'testuser'}
+2025-10-01 03:50:59,251 - __main__ - INFO - 
+Test 3: Get user info with token
+2025-10-01 03:50:59,267 - __main__ - INFO - Status code: 404

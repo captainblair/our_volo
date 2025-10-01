@@ -1,0 +1,26 @@
+2025-10-01 03:52:26,426 - django.db.backends - DEBUG - (0.002) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+2025-10-01 03:52:26,431 - django.db.backends - DEBUG - (0.001) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+2025-10-01 03:52:26,440 - django.db.backends - DEBUG - (0.003) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:52:27,678 - __main__ - INFO - Testing serializer with user: test@volo.africa
+2025-10-01 03:52:27,678 - __main__ - INFO - 
+Test 1: Valid credentials
+2025-10-01 03:52:27,686 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:52:28,703 - __main__ - INFO - Serializer validation successful
+2025-10-01 03:52:28,703 - __main__ - INFO - Tokens: {'refresh': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1OTM2NjM0OCwiaWF0IjoxNzU5Mjc5OTQ4LCJqdGkiOiJjYmY5NGYxYTBlMDA0NmE1ODJjYTMyMzdlMTNiZGZjZiIsInVzZXJfaWQiOiIxIiwiZW1haWwiOiJ0ZXN0QHZvbG8uYWZyaWNhIiwiZmlyc3RfbmFtZSI6IlRlc3QiLCJsYXN0X25hbWUiOiJVc2VyIn0.scpjTTOah2wC5nJy54MayFJtjySpuEeggn4A0_xs7uA', 'access': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5MjgzNTQ4LCJpYXQiOjE3NTkyNzk5NDgsImp0aSI6ImEyZGY2NTU1MDUxYTRkMDQ5NmQ4NDk4MDY0MzczYjY5IiwidXNlcl9pZCI6IjEiLCJlbWFpbCI6InRlc3RAdm9sby5hZnJpY2EiLCJmaXJzdF9uYW1lIjoiVGVzdCIsImxhc3RfbmFtZSI6IlVzZXIifQ.Ga8eu9ewJyKRKPf9dpjLEXtrJ5PwrvNRzMvXX_a8vF4', 'user_id': 1, 'email': 'test@volo.africa', 'username': 'testuser'}
+2025-10-01 03:52:28,703 - __main__ - INFO - 
+Test 2: Invalid password
+2025-10-01 03:52:28,707 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'test@volo.africa' LIMIT 21; args=('test@volo.africa',); alias=default
+2025-10-01 03:52:29,803 - __main__ - INFO - Serializer validation failed as expected
+2025-10-01 03:52:29,804 - __main__ - INFO - Errors: {'non_field_errors': [ErrorDetail(string='An error occurred during authentication. Please try again.', code='invalid')]}
+2025-10-01 03:52:29,804 - __main__ - INFO - 
+Test 3: Non-existent email
+2025-10-01 03:52:29,807 - django.db.backends - DEBUG - (0.001) SELECT `users_user`.`id`, `users_user`.`password`, `users_user`.`last_login`, `users_user`.`is_superuser`, `users_user`.`username`, `users_user`.`first_name`, `users_user`.`last_name`, `users_user`.`is_staff`, `users_user`.`is_active`, `users_user`.`date_joined`, `users_user`.`email`, `users_user`.`phone_number`, `users_user`.`role_id`, `users_user`.`department_id`, `users_user`.`email_confirmed` FROM `users_user` WHERE `users_user`.`email` = 'nonexistent@example.com' LIMIT 21; args=('nonexistent@example.com',); alias=default
+2025-10-01 03:52:29,809 - __main__ - INFO - Serializer validation failed as expected
+2025-10-01 03:52:29,810 - __main__ - INFO - Errors: {'non_field_errors': [ErrorDetail(string='Invalid email or password', code='invalid')]}
