@@ -14,14 +14,24 @@ export default function Login() {
 
   const submit = async (e) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
+    console.log("Attempting login with:", { email });
     try {
       await login(email, password);
+      console.log("Login successful, navigating to dashboard");
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid credentials");
+      console.error("Login error:", err);
+      // Show more specific error message if available
+      const errorMsg = err.response?.data?.detail || 
+                     err.response?.data?.non_field_errors?.[0] || 
+                     err.message || 
+                     "Failed to login. Please check your credentials and try again.";
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
