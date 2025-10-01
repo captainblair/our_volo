@@ -39,7 +39,7 @@ export default function Homepage() {
       const scrollPosition = window.scrollY + 100;
       
       for (const section of sections) {
-        const element = document.getElementId(section);
+        const element = document.getElementById(section);
         if (element) {
           const offsetTop = element.offsetTop;
           const offsetBottom = offsetTop + element.offsetHeight;
@@ -212,27 +212,27 @@ export default function Homepage() {
       </section>
 
       <div>
-      {/* About Section with Video */}
-      <section id="about" className="relative w-full h-[60vh] overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            src={videoSource}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-            onError={() => console.error("Failed to load video:", videoSource)}
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <div className="text-center text-white px-4 max-w-3xl">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-400">Our Mission</h2>
-              <p className="text-xl md:text-2xl mb-8">Happy drivers, happy riders, and a better environment.</p>
+        {/* About Section with Video */}
+        <section id="about" className="relative w-full h-[60vh] overflow-hidden">
+          <div className="absolute inset-0">
+            <video
+              src={videoSource}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+              onError={() => console.error("Failed to load video:", videoSource)}
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <div className="text-center text-white px-4 max-w-3xl">
+                <h2 className="text-4xl md:text-5xl font-bold mb-4 text-yellow-400">Our Mission</h2>
+                <p className="text-xl md:text-2xl mb-8">Happy drivers, happy riders, and a better environment.</p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
 
       {/* Footer */}
       <footer id="contact" className="bg-gray-800 text-white py-12 px-4">

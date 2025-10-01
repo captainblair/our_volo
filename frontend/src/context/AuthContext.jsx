@@ -1,42 +1,57 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import api from '../services/api';
 
-const Ctx = createContext(null);
+// Create the auth context
+const AuthContext = createContext(null);
 
+/**
+ * AuthProvider component that provides authentication context to the app
+ */
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // ✅ Added error state
+  const [error, setError] = useState(null);
 
+  // Fetch user data when token changes
   useEffect(() => {
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      api
-        .get('/users/me/')
-        .then((res) => {
-          setUser(res.data);
-          setLoading(false);
-        })
-        .catch((err) => {
+    const fetchUserData = async () => {
+      if (token) {
+        try {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          const response = await api.get('/users/me/');
+          setUser(response.data);
+          setError(null);
+        } catch (err) {
           console.error('Error fetching user data:', err);
-          logout();
-        });
-    } else {
-      setLoading(false);
-    }
+          if (err.response?.status === 401) {
+            // Token is invalid or expired
+            logout();
+          }
+          setError('Failed to load user data');
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, [token]);
 
+  /**
+   * Login user with email and password
+   */
   const login = async (email, password) => {
     try {
-      console.log('Attempting login with:', { email });
+      setLoading(true);
+      setError(null);
 
       const formData = new URLSearchParams();
-      formData.append('email', email); // Using 'email' to match the backend's EmailTokenObtainPairSerializer
+      formData.append('email', email);
       formData.append('password', password);
-
-      console.log('Sending login request to /auth/token/');
 
       const response = await axios({
         method: 'post',
@@ -44,39 +59,33 @@ export function AuthProvider({ children }) {
         data: formData,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Accept: 'application/json',
+          'Accept': 'application/json',
         },
         withCredentials: true,
         timeout: 10000,
       });
 
-      console.log('Login response status:', response.status);
-      console.log('Login response data:', response.data);
-
-      if (!response.data || !response.data.access) {
+      if (!response.data?.access) {
         throw new Error('Authentication failed: No access token received');
       }
 
-      const { access: token, refresh: refreshToken } = response.data;
-
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      setToken(token);
-      localStorage.setItem('token', token);
+      const { access: newToken, refresh: refreshToken } = response.data;
+      
+      // Set the token in localStorage and state
+      localStorage.setItem('token', newToken);
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
       }
+      
+      // Set the token in the API client
+      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      setToken(newToken);
 
-      try {
-        console.log('Fetching user data...');
-        const userRes = await api.get('/users/me/');
-        setUser(userRes.data);
-        setError(null); // ✅ clear error if login succeeds
-        return userRes.data;
-      } catch (userErr) {
-        console.error('Error fetching user data:', userErr);
-        return { email };
-      }
+      // Fetch and set user data
+      const userResponse = await api.get('/users/me/');
+      setUser(userResponse.data);
+      
+      return userResponse.data;
     } catch (err) {
       console.error('Login error:', err);
       let errorMessage = 'An error occurred during login';
@@ -86,7 +95,7 @@ export function AuthProvider({ children }) {
           errorMessage = 'Invalid email or password';
         } else if (err.response.status === 401) {
           errorMessage = 'Authentication failed. Please check your credentials.';
-        } else if (err.response.data && err.response.data.detail) {
+        } else if (err.response.data?.detail) {
           errorMessage = err.response.data.detail;
         }
       } else if (err.request) {
@@ -95,23 +104,71 @@ export function AuthProvider({ children }) {
         errorMessage = `Request error: ${err.message}`;
       }
 
-      setError(errorMessage); // ✅ Now works
+      setError(errorMessage);
       throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
+  /**
+   * Logout the current user
+   */
+  const logout = useCallback(() => {
+    // Clear tokens from storage
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    
+    // Clear auth header
+    delete api.defaults.headers.common['Authorization'];
+    
+    // Reset state
+    setToken(null);
+    setUser(null);
+    setError(null);
+  }, []);
+
+  /**
+   * Update user data in the context
+   */
+  const updateUser = useCallback((userData) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      ...userData
+    }));
+  }, []);
+
+  // Context value
+  const contextValue = {
+    token,
+    user,
+    loading,
+    error,
+    login,
+    logout,
+    updateUser,
+    isAuthenticated: !!token,
   };
 
   return (
-    <Ctx.Provider value={{ token, user, login, logout, loading, error }}>
-      {children}
-    </Ctx.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {!loading && children}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
+    </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(Ctx);
+/**
+ * Custom hook to use the auth context
+ */
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
