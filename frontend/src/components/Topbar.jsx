@@ -174,11 +174,11 @@ export default function Topbar({ onMenuToggle }) {
                       }}
                     />
                   ) : (
-                    <span>{user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}</span>
+                    <span>{user?.first_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}</span>
                   )}
                 </div>
                 <span className="hidden md:inline-block ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {user?.name || 'User'}
+                  {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.name || 'User'}
                 </span>
               </button>
 
@@ -188,7 +188,7 @@ export default function Topbar({ onMenuToggle }) {
                   {/* Profile Section */}
                   <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                      {user?.name || user?.email}
+                      {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.name || user?.email}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {user?.email}

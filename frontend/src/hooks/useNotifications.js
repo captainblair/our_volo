@@ -3,10 +3,17 @@ import { useEffect } from 'react'
 
 export default function useNotifications(onMessage){
   useEffect(()=>{
-    const ws = new WebSocket('ws://localhost:8000/ws/notifications/')
-    ws.onmessage = (e)=>{
-      try{ onMessage(JSON.parse(e.data)) }catch{}
-    }
-    return ()=> ws.close()
+    // WebSocket disabled for now - backend not configured
+    // TODO: Implement WebSocket server for real-time notifications
+    console.log('WebSocket notifications disabled');
+    
+    // Use polling instead (every 30 seconds)
+    const interval = setInterval(() => {
+      if (onMessage) {
+        onMessage({ type: 'poll' });
+      }
+    }, 30000);
+    
+    return () => clearInterval(interval);
   },[onMessage])
 }

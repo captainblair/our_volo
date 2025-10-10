@@ -38,8 +38,10 @@ export default function Dashboard() {
           dueDate: task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'
         })));
 
-        // Get recent messages (last 5)
-        setRecentMessages(messages.slice(0, 5).map(msg => ({
+        // Get recent messages (last 5) - filter out read messages
+        const readMessages = JSON.parse(localStorage.getItem('readMessages') || '[]');
+        const unreadMessages = messages.filter(msg => !readMessages.includes(msg.id));
+        setRecentMessages(unreadMessages.slice(0, 5).map(msg => ({
           ...msg,
           timestamp: format(new Date(msg.timestamp), 'MMM dd, yyyy HH:mm')
         })));
@@ -58,6 +60,14 @@ export default function Dashboard() {
   };
 
   const handleMessageClick = (messageId) => {
+    // Mark message as read
+    const readMessages = JSON.parse(localStorage.getItem('readMessages') || '[]');
+    if (!readMessages.includes(messageId)) {
+      readMessages.push(messageId);
+      localStorage.setItem('readMessages', JSON.stringify(readMessages));
+    }
+    // Remove from dashboard
+    setRecentMessages(prev => prev.filter(msg => msg.id !== messageId));
     navigate(`/messages/${messageId}`);
   };
 
