@@ -26,8 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone_number', 
-                 'role', 'department', 'role_id', 'department_id', 'email_confirmed', 'profile_picture']
-        read_only_fields = ['id', 'profile_picture']
+                 'role', 'department', 'role_id', 'department_id', 'email_confirmed', 'profile_picture', 'date_joined']
+        read_only_fields = ['id', 'profile_picture', 'date_joined']
     
     def get_profile_picture(self, obj):
         if obj.profile_picture:
@@ -72,25 +72,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         
         return attrs
 
-
-class ProfilePictureSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['profile_picture']
-        extra_kwargs = {
-            'profile_picture': {'required': True}
-        }
-    
-    def update(self, instance, validated_data):
-        # Delete old profile picture if it exists
-        if instance.profile_picture:
-            instance.profile_picture.delete(save=False)
-        
-        # Set and save the new profile picture
-        instance.profile_picture = validated_data['profile_picture']
-        instance.save()
-        return instance
-
     def create(self, validated_data):
         validated_data.pop('password_confirmation')
         validated_data.pop('agree_terms')
@@ -117,3 +98,22 @@ class ProfilePictureSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class ProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_picture']
+        extra_kwargs = {
+            'profile_picture': {'required': True}
+        }
+    
+    def update(self, instance, validated_data):
+        # Delete old profile picture if it exists
+        if instance.profile_picture:
+            instance.profile_picture.delete(save=False)
+        
+        # Set and save the new profile picture
+        instance.profile_picture = validated_data['profile_picture']
+        instance.save()
+        return instance

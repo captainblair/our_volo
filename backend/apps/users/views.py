@@ -27,7 +27,23 @@ class MeView(generics.RetrieveUpdateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().select_related('role','department')
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    
+    def get_permissions(self):
+        # Allow authenticated users to list/retrieve (for department members view)
+        if self.action in ['list', 'retrieve']:
+            return [permissions.IsAuthenticated()]
+        # Only admins can create/update/delete
+        return [IsAdmin()]
+    
+    def get_queryset(self):
+        # Regular users can only see users in their department
+        user = self.request.user
+        if hasattr(user, 'role') and user.role and user.role.name == 'Admin':
+            return User.objects.all().select_related('role', 'department')
+        # Regular users see only their department members
+        if hasattr(user, 'department') and user.department:
+            return User.objects.filter(department=user.department).select_related('role', 'department')
+        return User.objects.none()
     
     @action(detail=True, methods=['post'])
     def assign_role(self, request, pk=None):
