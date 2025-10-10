@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import salahImage from "../media/salah-regouane-Y2ZS27IE0Xo-unsplash.jpg";
 
@@ -10,6 +10,8 @@ export default function Signup() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [departments, setDepartments] = useState([]);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -18,12 +20,28 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    // Load departments on component mount
+    fetch(`${API_BASE_URL}/api/departments/`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load departments');
+        return res.json();
+      })
+      .then(data => {
+        setDepartments(Array.isArray(data) ? data : []);
+      })
+      .catch(err => {
+        console.error('Error loading departments:', err);
+        setError('Failed to load departments. Please refresh the page.');
+      });
+  }, []);
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    if (!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !phoneNumber || !departmentId || !password || !confirmPassword) {
       setError("All fields are required");
       setLoading(false);
       return;
@@ -52,6 +70,7 @@ export default function Signup() {
           last_name: lastName,
           email,
           phone_number: phoneNumber,
+          department_id: parseInt(departmentId),
           password,
           password_confirmation: confirmPassword,
           agree_terms: agreeTerms,
@@ -83,6 +102,24 @@ export default function Signup() {
   };
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
+
+  // Fallback if there's any rendering error
+  if (error && departments.length === 0 && !loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+          <h2 className="text-xl font-bold text-red-600 mb-4">Error Loading Page</h2>
+          <p className="text-gray-700 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-stretch bg-gray-100" style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
@@ -153,6 +190,21 @@ export default function Signup() {
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
             />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-800 mb-1">Department</label>
+            <select
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={departmentId}
+              onChange={(e) => setDepartmentId(e.target.value)}
+              required
+            >
+              <option value="">Select your department</option>
+              {departments.map(dept => (
+                <option key={dept.id} value={dept.id}>{dept.name}</option>
+              ))}
+            </select>
           </div>
           
           <div>

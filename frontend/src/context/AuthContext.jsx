@@ -58,12 +58,16 @@ export function AuthProvider({ children }) {
   // Role checking functions
   const hasRole = (role) => {
     if (!user) return false;
-    return user.role === role;
+    // Handle both object and string role formats, case-insensitive
+    const userRole = (user.role?.name || user.role || '').toLowerCase();
+    const checkRole = (role || '').toLowerCase();
+    return userRole === checkRole;
   };
 
   const hasAnyRole = (roles) => {
     if (!user) return false;
-    return roles.some(role => user.role === role);
+    const userRole = (user.role?.name || user.role || '').toLowerCase();
+    return roles.some(role => userRole === (role || '').toLowerCase());
   };
 
   const isInDepartment = (departmentId) => {
@@ -345,6 +349,7 @@ export function AuthProvider({ children }) {
     loading,
     error,
     login,
+    logout,
     updateUser,
     roles: userRoles,
     departments: userDepartments,

@@ -11,7 +11,7 @@ import Dashboard from './pages/DashboardNew';
 import TasksPage from './pages/TasksPage';
 import TaskDetailPage from './pages/TaskDetailPage';
 import MessagingPage from './pages/MessagingPage';
-import AdminPanel from './components/admin/AdminPanel';
+import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -73,7 +73,8 @@ const App = () => (
           <Route path="/reports" element={<ReportsPage />} />
           
           {/* Admin routes */}
-          <Route path="/admin/*" element={<AdminPanel />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/*" element={<AdminPage />} />
         </Route>
 
         {/* 404 - Not Found */}

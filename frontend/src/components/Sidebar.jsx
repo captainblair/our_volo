@@ -69,9 +69,12 @@ export default function Sidebar() {
   }, [pathname]);
 
   useEffect(() => {
-    // Check if user has admin role
-    if (user?.role?.name === 'admin' || user?.role === 'admin') {
+    // Check if user has admin role (case-insensitive)
+    const roleName = user?.role?.name?.toLowerCase() || user?.role?.toLowerCase() || '';
+    if (roleName === 'admin') {
       setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
     }
   }, [user]);
 
