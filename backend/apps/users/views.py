@@ -1,9 +1,16 @@
 from rest_framework import generics, permissions, viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
 from .models import Role, Department
-from .serializers import RegisterSerializer, UserSerializer, RoleSerializer, DepartmentSerializer
+from .serializers import (
+    RegisterSerializer, 
+    UserSerializer, 
+    RoleSerializer, 
+    DepartmentSerializer,
+    ProfilePictureSerializer
+)
 from .permissions import IsAdmin
 
 User = get_user_model()
@@ -54,4 +61,51 @@ class RoleViewSet(viewsets.ModelViewSet):
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    permission_classes = [IsAdmin]
+    
+    def get_permissions(self):
+        # Allow anyone to list/retrieve departments (for registration)
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        # Only admins can create/update/delete
+        return [IsAdmin()]
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def upload_profile_picture(request):
+    """
+    Upload a profile picture for the authenticated user.
+    """
+    if 'profile_picture' not in request.FILES:
+        return Response(
+            {'error': 'No file was provided'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Validate file size (max 2MB)
+    if request.FILES['profile_picture'].size > 2 * 1024 * 1024:
+        return Response(
+            {'error': 'File size should not exceed 2MB'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Validate file type
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif']
+    if request.FILES['profile_picture'].content_type not in allowed_types:
+        return Response(
+            {'error': 'Only JPEG, PNG, and GIF images are allowed'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Update the user's profile picture
+    user = request.user
+    serializer = ProfilePictureSerializer(user, data=request.data, partial=True)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {'profile_picture': request.build_absolute_uri(user.profile_picture.url)},
+            status=status.HTTP_200_OK
+        )
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

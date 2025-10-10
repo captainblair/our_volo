@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from .models import Role, Department
 
 User = get_user_model()
@@ -20,20 +21,38 @@ class UserSerializer(serializers.ModelSerializer):
     role_id = serializers.PrimaryKeyRelatedField(queryset=Role.objects.all(), source='role', write_only=True, required=False, allow_null=True)
     department_id = serializers.PrimaryKeyRelatedField(queryset=Department.objects.all(), source='department', write_only=True, required=False, allow_null=True)
 
+    profile_picture = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ['id','username','first_name','last_name','email','phone_number','role','department','role_id','department_id','email_confirmed']
-        read_only_fields = ['id']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone_number', 
+                 'role', 'department', 'role_id', 'department_id', 'email_confirmed', 'profile_picture']
+        read_only_fields = ['id', 'profile_picture']
+    
+    def get_profile_picture(self, obj):
+        if obj.profile_picture:
+            request = self.context.get('request')
+            if request is not None:
+                return request.build_absolute_uri(obj.profile_picture.url)
+            return obj.profile_picture.url
+        return None
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirmation = serializers.CharField(write_only=True)
     agree_terms = serializers.BooleanField(write_only=True)
     subscribe_emails = serializers.BooleanField(write_only=True, required=False, default=True)
+    department_id = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), 
+        source='department', 
+        write_only=True, 
+        required=True,
+        error_messages={'required': 'Please select a department'}
+    )
     
     class Meta:
         model = User
-        fields = ['first_name','last_name','email','phone_number','password','password_confirmation','agree_terms','subscribe_emails']
+        fields = ['first_name','last_name','email','phone_number','department_id','password','password_confirmation','agree_terms','subscribe_emails']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirmation']:
@@ -53,10 +72,29 @@ class RegisterSerializer(serializers.ModelSerializer):
         
         return attrs
 
+
+class ProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_picture']
+        extra_kwargs = {
+            'profile_picture': {'required': True}
+        }
+    
+    def update(self, instance, validated_data):
+        # Delete old profile picture if it exists
+        if instance.profile_picture:
+            instance.profile_picture.delete(save=False)
+        
+        # Set and save the new profile picture
+        instance.profile_picture = validated_data['profile_picture']
+        instance.save()
+        return instance
+
     def create(self, validated_data):
         validated_data.pop('password_confirmation')
         validated_data.pop('agree_terms')
-        validated_data.pop('subscribe_emails')
+        validated_data.pop('subscribe_emails', None)
         password = validated_data.pop('password')
         
         # Generate username from email
@@ -67,6 +105,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         while User.objects.filter(username=username).exists():
             username = f"{original_username}{counter}"
             counter += 1
+        
+        # Assign default "Employee" role to new users
+        try:
+            employee_role = Role.objects.get(name='Employee')
+            validated_data['role'] = employee_role
+        except Role.DoesNotExist:
+            pass  # If Employee role doesn't exist, user will have no role
         
         user = User(username=username, **validated_data)
         user.set_password(password)

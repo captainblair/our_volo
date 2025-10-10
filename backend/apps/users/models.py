@@ -1,6 +1,12 @@
+import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.conf import settings
+
+def user_profile_picture_path(instance, filename):
+    # File will be uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
+    return f'profile_pictures/user_{instance.id}/{filename}'
 
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -15,6 +21,12 @@ class Department(models.Model):
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    profile_picture = models.ImageField(
+        upload_to=user_profile_picture_path,
+        null=True,
+        blank=True,
+        help_text='Profile picture for the user'
+    )
     role = models.ForeignKey(Role, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
     email_confirmed = models.BooleanField(default=False)
