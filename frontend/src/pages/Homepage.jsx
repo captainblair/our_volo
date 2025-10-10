@@ -58,54 +58,6 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-40">
-        <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-yellow-600">VOLO</h1>
-        </div>
-        
-        <div className="hidden md:flex space-x-8">
-          <button 
-            onClick={() => scrollToSection('home')}
-            className={`${activeSection === 'home' ? 'text-orange-600 font-semibold' : 'text-gray-700'} hover:text-orange-500 transition-colors`}
-          >
-            Home
-          </button>
-          <button 
-            onClick={() => scrollToSection('features')}
-            className={`${activeSection === 'features' ? 'text-orange-600 font-semibold' : 'text-gray-700'} hover:text-orange-500 transition-colors`}
-          >
-            Features
-          </button>
-          <button 
-            onClick={() => scrollToSection('about')}
-            className={`${activeSection === 'about' ? 'text-orange-600 font-semibold' : 'text-gray-700'} hover:text-orange-500 transition-colors`}
-          >
-            About
-          </button>
-          <button 
-            onClick={() => scrollToSection('contact')}
-            className={`${activeSection === 'contact' ? 'text-orange-600 font-semibold' : 'text-gray-700'} hover:text-orange-500 transition-colors`}
-          >
-            Contact
-          </button>
-        </div>
-        
-        <div className="flex space-x-4">
-          <button 
-            onClick={() => navigate('/login')}
-            className="px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
-          >
-            Login
-          </button>
-          <button 
-            onClick={() => navigate('/signup')}
-            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-          >
-            Sign Up
-          </button>
-        </div>
-      </nav>
 
       {/* Hero Section with Static Image */}
       <section id="home" className="relative w-full h-screen overflow-hidden">

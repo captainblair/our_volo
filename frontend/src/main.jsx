@@ -21,6 +21,7 @@ import ReportsPage from './pages/ReportsPage';
 
 // Components
 import Layout from './components/Layout';
+import PublicLayout from './components/PublicLayout';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -35,10 +36,10 @@ function PublicRoute() {
   const { token } = useAuth();
   // Only redirect to dashboard if user is trying to access login/signup when already authenticated
   const location = window.location.pathname;
-  if (token && (location === '/login' || location === '/signup')) {
+  if (token && (location === '/login' || location === '/signup' || location === '/')) {
     return <Navigate to="/dashboard" replace />;
   }
-  return <Outlet />;
+  return <PublicLayout><Outlet /></PublicLayout>;
 }
 
 const App = () => (
@@ -48,9 +49,12 @@ const App = () => (
       <Routes>
         {/* Public routes */}
         <Route element={<PublicRoute />}>
-          <Route index element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<div className="container mx-auto p-4">About Us Page</div>} />
+          <Route path="/features" element={<div className="container mx-auto p-4">Features Page</div>} />
+          <Route path="/pricing" element={<div className="container mx-auto p-4">Pricing Page</div>} />
         </Route>
 
         {/* Protected routes with layout */}
