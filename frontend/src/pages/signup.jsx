@@ -19,6 +19,18 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordMatch, setPasswordMatch] = useState(null);
+  
+  // Check password match whenever passwords change
+  useEffect(() => {
+    if (confirmPassword === '') {
+      setPasswordMatch(null);
+    } else if (password === confirmPassword && password !== '') {
+      setPasswordMatch(true);
+    } else if (confirmPassword !== '') {
+      setPasswordMatch(false);
+    }
+  }, [password, confirmPassword]);
 
   useEffect(() => {
     // Load departments on component mount
@@ -236,20 +248,38 @@ export default function Signup() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full border rounded px-3 py-2 pr-20 focus:outline-none focus:ring-2 ${
+                  passwordMatch === true ? 'border-green-500 focus:ring-green-500' : 
+                  passwordMatch === false ? 'border-red-500 focus:ring-red-500' : 
+                  'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              <button
-                type="button"
-                onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-gray-600 hover:text-gray-900 bg-transparent"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-2">
+                {passwordMatch === true && (
+                  <span className="text-green-600 font-bold text-lg">✓</span>
+                )}
+                {passwordMatch === false && (
+                  <span className="text-red-600 font-bold text-lg">✗</span>
+                )}
+                <button
+                  type="button"
+                  onClick={toggleShowPassword}
+                  className="text-sm text-gray-600 hover:text-gray-900 bg-transparent"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
+            {passwordMatch === true && (
+              <p className="text-xs text-green-600 mt-1">✓ Passwords match</p>
+            )}
+            {passwordMatch === false && (
+              <p className="text-xs text-red-600 mt-1">✗ Passwords do not match</p>
+            )}
           </div>
           
           <div className="flex items-center">

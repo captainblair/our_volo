@@ -65,7 +65,8 @@ export default function HomePage() {
           <img
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
+            style={{ objectPosition: 'center 30%' }}
             onError={() => console.error(`Failed to load image: ${slide.image}`)}
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">

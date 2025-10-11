@@ -5,9 +5,14 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@volo.africa");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [password, setPassword] = useState("Admin@123");
+  
+  // Load saved credentials if Remember Me was checked
+  const savedEmail = localStorage.getItem('rememberedEmail') || "";
+  const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
+  
+  const [email, setEmail] = useState(savedEmail || "");
+  const [rememberMe, setRememberMe] = useState(savedRememberMe);
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -16,19 +21,34 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    console.log("Attempting login with:", { email });
+    
     try {
       await login(email, password);
-      console.log("Login successful, navigating to dashboard");
+      
+      // Handle Remember Me
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', email);
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('rememberMe');
+      }
+      
       navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
-      // Show more specific error message if available
-      const errorMsg = err.response?.data?.detail || 
-                     err.response?.data?.non_field_errors?.[0] || 
-                     err.message || 
-                     "Failed to login. Please check your credentials and try again.";
-      setError(errorMsg);
+      
+      // Show specific error messages
+      if (err.response?.status === 401) {
+        setError("❌ Wrong email or password. Please try again.");
+      } else if (err.response?.status === 400) {
+        setError("❌ Invalid credentials. Please check your email and password.");
+      } else {
+        const errorMsg = err.response?.data?.detail || 
+                       err.response?.data?.non_field_errors?.[0] || 
+                       "❌ Login failed. Please try again.";
+        setError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -37,19 +57,19 @@ export default function Login() {
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-900 to-gray-800 text-white">
+    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-to-r from-blue-900 to-gray-800 text-white px-4 py-8">
       {/* Left Side Content */}
-      <div className="w-full md:w-1/2 p-8 flex items-center justify-center">
+      <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center mb-8 md:mb-0">
         <div className="text-center max-w-md">
-          <h1 className="text-5xl font-bold mb-4 text-yellow-400">VOLO</h1>
-          <p className="text-lg mb-4 text-white">Unlock a world of efficient task management and seamless communication with VOLO.</p>
-          <p className="text-md text-gray-100">Step into a platform designed to empower your team and drive success.</p>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-yellow-400">VOLO</h1>
+          <p className="text-base md:text-lg mb-4 text-white">Unlock a world of efficient task management and seamless communication with VOLO.</p>
+          <p className="text-sm md:text-md text-gray-100">Step into a platform designed to empower your team and drive success.</p>
         </div>
       </div>
 
       {/* Right Side Form */}
-      <div className="w-full md:w-1/2 p-8 flex items-center justify-center">
-        <div className="bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md">
           <h1 className="text-2xl font-semibold mb-6 text-gray-900 text-center">Sign In</h1>
           {error && <div className="text-red-600 text-sm mb-4 text-center">{error}</div>}
           <form onSubmit={submit} className="space-y-4">
