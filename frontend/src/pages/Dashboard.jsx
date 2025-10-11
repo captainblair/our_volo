@@ -19,8 +19,14 @@ export default function Dashboard() {
       try {
         setLoading(true);
         const [tasksRes, messagesRes] = await Promise.all([
-          api.get('/tasks/'),
-          api.get('/messaging/department/')
+          api.get('/tasks/').catch(err => {
+            console.error('Error loading tasks:', err);
+            return { data: [] };
+          }),
+          api.get('/messaging/department/').catch(err => {
+            console.error('Error loading messages:', err);
+            return { data: [] };
+          })
         ]);
 
         const tasks = tasksRes.data || [];
@@ -45,6 +51,7 @@ export default function Dashboard() {
         })));
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        // Don't logout on error - just show empty data
       } finally {
         setLoading(false);
       }
@@ -58,7 +65,8 @@ export default function Dashboard() {
   };
 
   const handleMessageClick = (messageId) => {
-    navigate(`/messages/${messageId}`);
+    // Navigate to messages page (doesn't support individual message view)
+    navigate('/messages');
   };
 
   if (loading) {

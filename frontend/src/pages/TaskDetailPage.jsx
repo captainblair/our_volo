@@ -72,7 +72,15 @@ export default function TaskDetailPage() {
         }
       } catch (err) {
         console.error('Error loading task:', err);
-        setError('Failed to load task. It may have been deleted or you may not have permission to view it.');
+        console.error('Error details:', err.response?.data);
+        // Don't logout on error - just show error message
+        if (err.response?.status === 404) {
+          setError('Task not found. It may have been deleted.');
+        } else if (err.response?.status === 403) {
+          setError('You do not have permission to view this task.');
+        } else {
+          setError('Failed to load task. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -183,12 +191,12 @@ export default function TaskDetailPage() {
   if (error || !task) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <div className="text-red-500 mb-4">
+        <div className="text-red-500 dark:text-red-400 mb-4">
           <svg className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           {error || 'Task not found'}
         </h3>
         <div className="mt-6">
@@ -212,30 +220,30 @@ export default function TaskDetailPage() {
       <div className="mb-6">
         <Link 
           to="/tasks" 
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
         >
           <BsArrowLeft className="mr-2 h-4 w-4" />
           Back to tasks
         </Link>
       </div>
       
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+      <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
               {isEditing ? (
                 <input
                   type="text"
                   name="task_title"
                   value={editData.task_title}
                   onChange={handleInputChange}
-                  className="block w-full border-0 p-0 text-lg font-medium text-gray-900 focus:ring-0 focus:outline-none"
+                  className="block w-full border-0 p-0 text-lg font-medium text-gray-900 dark:text-white dark:bg-gray-800 focus:ring-0 focus:outline-none"
                 />
               ) : (
                 task.task_title
               )}
             </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+            <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
               Task details and information
             </p>
           </div>
@@ -247,8 +255,8 @@ export default function TaskDetailPage() {
                 onClick={toggleComplete}
                 className={`inline-flex items-center px-3 py-1.5 border rounded-md text-sm font-medium ${
                   task.status === 'completed'
-                    ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
                 }`}
               >
                 {task.status === 'completed' ? (
@@ -278,7 +286,7 @@ export default function TaskDetailPage() {
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 <BsPencil className="-ml-0.5 mr-1.5 h-4 w-4" />
                 Edit
@@ -288,7 +296,7 @@ export default function TaskDetailPage() {
             <button
               type="button"
               onClick={handleDelete}
-              className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               <BsTrash className="-ml-0.5 mr-1.5 h-4 w-4" />
               Delete
@@ -296,18 +304,18 @@ export default function TaskDetailPage() {
           </div>
         </div>
         
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-          <dl className="sm:divide-y sm:divide-gray-200">
+        <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-5 sm:p-0">
+          <dl className="sm:divide-y sm:divide-gray-200 dark:sm:divide-gray-700">
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Description</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 {isEditing ? (
                   <textarea
                     name="task_desc"
                     rows={3}
                     value={editData.task_desc}
                     onChange={handleInputChange}
-                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder="Add a description..."
                   />
                 ) : (
@@ -317,14 +325,14 @@ export default function TaskDetailPage() {
             </div>
             
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned To</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 {isEditing ? (
                   <select
                     name="assigned_to"
                     value={editData.assigned_to}
                     onChange={handleInputChange}
-                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="">Unassigned</option>
                     {users.map(user => (
@@ -335,7 +343,7 @@ export default function TaskDetailPage() {
                   </select>
                 ) : task.assigned_to ? (
                   <div className="flex items-center">
-                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-2">
+                    <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 mr-2">
                       <BsPerson className="h-4 w-4" />
                     </div>
                     <span>{task.assigned_to.username}</span>
@@ -347,14 +355,14 @@ export default function TaskDetailPage() {
             </div>
             
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Status</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 {isEditing ? (
                   <select
                     name="status"
                     value={editData.status}
                     onChange={handleInputChange}
-                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     {statusOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -371,14 +379,14 @@ export default function TaskDetailPage() {
             </div>
             
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Priority</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Priority</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 {isEditing ? (
                   <select
                     name="priority"
                     value={editData.priority}
                     onChange={handleInputChange}
-                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     {priorityOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -395,22 +403,22 @@ export default function TaskDetailPage() {
             </div>
             
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Due Date</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 {isEditing ? (
                   <input
                     type="date"
                     name="due_date"
                     value={editData.due_date}
                     onChange={handleInputChange}
-                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                    className="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 ) : task.due_date ? (
                   <div className="flex items-center">
-                    <BsCalendarDate className="mr-1.5 h-4 w-4 text-gray-500" />
+                    <BsCalendarDate className="mr-1.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
                     {formatDate(task.due_date)}
                     {new Date(task.due_date) < new Date() && task.status !== 'completed' && (
-                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
                         Overdue
                       </span>
                     )}
@@ -422,10 +430,10 @@ export default function TaskDetailPage() {
             </div>
             
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Created</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Created</dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-300 sm:mt-0 sm:col-span-2">
                 <div className="flex items-center">
-                  <BsClock className="mr-1.5 h-4 w-4 text-gray-500" />
+                  <BsClock className="mr-1.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
                   {formatDate(task.created_at)}
                 </div>
               </dd>
@@ -437,21 +445,21 @@ export default function TaskDetailPage() {
       {/* Comments Section */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Comments</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Comments</h3>
         </div>
         
         {/* Add Comment Form */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6">
           <form onSubmit={handleAddComment}>
             <div className="px-4 py-5 sm:p-6">
               <div className="flex space-x-3">
                 <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
                     <BsPerson className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="border-b border-gray-200 focus-within:border-primary-500">
+                  <div className="border-b border-gray-200 dark:border-gray-700 focus-within:border-primary-500">
                     <label htmlFor="comment" className="sr-only">
                       Add your comment
                     </label>
@@ -459,7 +467,7 @@ export default function TaskDetailPage() {
                       rows={3}
                       name="comment"
                       id="comment"
-                      className="block w-full border-0 border-b border-transparent p-0 pb-2 resize-none focus:ring-0 focus:border-primary-500 sm:text-sm"
+                      className="block w-full border-0 border-b border-transparent p-0 pb-2 resize-none focus:ring-0 focus:border-primary-500 sm:text-sm bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                       placeholder="Add your comment..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
@@ -489,24 +497,24 @@ export default function TaskDetailPage() {
         <div className="space-y-4">
           {comments.length > 0 ? (
             comments.map(comment => (
-              <div key={comment.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <div key={comment.id} className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 mr-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                      <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
                         <BsPerson className="h-5 w-5" />
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {comment.user?.username || 'Unknown User'}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {formatDate(comment.created_at)}
                         </p>
                       </div>
-                      <p className="mt-1 text-sm text-gray-700 whitespace-pre-line">
+                      <p className="mt-1 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                         {comment.content}
                       </p>
                     </div>
@@ -515,10 +523,10 @@ export default function TaskDetailPage() {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 bg-white shadow sm:rounded-lg">
-              <BsChatSquareText className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No comments</h3>
-              <p className="mt-1 text-sm text-gray-500">
+            <div className="text-center py-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+              <BsChatSquareText className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No comments</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Get the discussion started by adding a comment.
               </p>
             </div>

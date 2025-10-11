@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { BsPencil, BsCheck2, BsX } from 'react-icons/bs';
+import { BsPencil, BsCheck2, BsX, BsCamera, BsPerson } from 'react-icons/bs';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
@@ -16,6 +16,8 @@ export default function ProfilePage() {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [picturePreview, setPicturePreview] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -67,6 +69,59 @@ export default function ProfilePage() {
     });
     setIsEditing(false);
     setMessage({ type: '', text: '' });
+  };
+
+  const handleProfilePictureChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Please select an image file' });
+      return;
+    }
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Image size should not exceed 2MB' });
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPicturePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload
+    setUploadingPicture(true);
+    setMessage({ type: '', text: '' });
+
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    try {
+      const response = await api.post('/users/me/upload-profile-picture/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update user context with new profile picture
+      const updatedUser = { ...user, profile_picture: response.data.profile_picture };
+      updateUser(updatedUser);
+      
+      setMessage({ type: 'success', text: 'Profile picture updated successfully!' });
+      setPicturePreview(null);
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      const errorMsg = error.response?.data?.error || 'Failed to upload profile picture';
+      setMessage({ type: 'error', text: errorMsg });
+      setPicturePreview(null);
+    } finally {
+      setUploadingPicture(false);
+    }
   };
 
   if (!user) {
@@ -125,6 +180,45 @@ export default function ProfilePage() {
             {message.text}
           </div>
         )}
+
+        {/* Profile Picture Section */}
+        <div className="mb-6 flex flex-col items-center">
+          <div className="relative">
+            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+              {picturePreview || user.profile_picture ? (
+                <img 
+                  src={picturePreview || user.profile_picture} 
+                  alt="Profile" 
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <BsPerson className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+              )}
+            </div>
+            <label 
+              htmlFor="profile-picture-upload" 
+              className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-primary-600 hover:bg-primary-700 flex items-center justify-center cursor-pointer shadow-lg"
+            >
+              <BsCamera className="h-5 w-5 text-white" />
+              <input
+                id="profile-picture-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                disabled={uploadingPicture}
+                className="hidden"
+              />
+            </label>
+            {uploadingPicture && (
+              <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
+          </div>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Click camera icon to upload (Max 2MB, JPEG/PNG/GIF)
+          </p>
+        </div>
 
         {/* Content */}
         {isEditing ? (
