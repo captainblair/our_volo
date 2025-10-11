@@ -53,9 +53,10 @@ class TaskSerializer(serializers.ModelSerializer):
             from apps.users.models import User
             try:
                 assigned_to = User.objects.get(id=assigned_to_id)
-                # Ensure assigned_to is in same department as requester
-                if request.user.department and assigned_to.department_id != request.user.department_id:
-                    raise serializers.ValidationError('You can only assign tasks within your department.')
+                # Admins can assign tasks to anyone, others only within their department
+                if request.user.role.name.lower() != 'admin':
+                    if request.user.department and assigned_to.department_id != request.user.department_id:
+                        raise serializers.ValidationError('You can only assign tasks within your department.')
                 attrs['assigned_to'] = assigned_to
             except User.DoesNotExist:
                 raise serializers.ValidationError('Assigned user does not exist.')
