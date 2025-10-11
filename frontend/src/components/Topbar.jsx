@@ -16,6 +16,9 @@ export default function Topbar({ onMenuToggle }) {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef(null);
   const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
   // Load unread message count
@@ -60,15 +63,127 @@ export default function Topbar({ onMenuToggle }) {
       
       // Refresh count every 30 seconds
       const interval = setInterval(loadNotificationCount, 30000);
-      return () => clearInterval(interval);
+      
+      // Listen for messages read event
+      const handleMessagesRead = () => {
+        loadNotificationCount();
+      };
+      window.addEventListener('messagesRead', handleMessagesRead);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('messagesRead', handleMessagesRead);
+      };
     }
   }, [user]);
 
+  // Debounced search function for real-time suggestions
+  const performSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults(null);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      // Search across tasks, messages, and users
+      const [tasksRes, messagesRes, usersRes] = await Promise.all([
+        api.get('/tasks/').catch(() => ({ data: [] })),
+        api.get('/messaging/department/').catch(() => ({ data: [] })),
+        api.get('/users/manage/').catch(() => ({ data: [] }))
+      ]);
+      
+      const tasks = tasksRes.data || [];
+      const messages = messagesRes.data || [];
+      const users = usersRes.data || [];
+      
+      const lowerQuery = query.toLowerCase();
+      
+      // Filter results based on search query
+      const filteredTasks = tasks.filter(task => 
+        task.task_title?.toLowerCase().includes(lowerQuery) ||
+        task.task_desc?.toLowerCase().includes(lowerQuery) ||
+        task.assigned_to?.first_name?.toLowerCase().includes(lowerQuery) ||
+        task.assigned_to?.email?.toLowerCase().includes(lowerQuery)
+      );
+      
+      const filteredMessages = messages.filter(msg =>
+        msg.message_body?.toLowerCase().includes(lowerQuery) ||
+        msg.sender?.first_name?.toLowerCase().includes(lowerQuery) ||
+        msg.sender?.last_name?.toLowerCase().includes(lowerQuery) ||
+        msg.sender?.email?.toLowerCase().includes(lowerQuery)
+      );
+      
+      const filteredUsers = users.filter(u =>
+        u.first_name?.toLowerCase().includes(lowerQuery) ||
+        u.last_name?.toLowerCase().includes(lowerQuery) ||
+        u.email?.toLowerCase().includes(lowerQuery) ||
+        u.username?.toLowerCase().includes(lowerQuery)
+      );
+      
+      setSearchResults({
+        tasks: filteredTasks.slice(0, 5),
+        messages: filteredMessages.slice(0, 5),
+        users: filteredUsers.slice(0, 5)
+      });
+    } catch (error) {
+      console.error('Search error:', error);
+      // Don't logout on error, just show empty results
+      setSearchResults({
+        tasks: [],
+        messages: [],
+        users: []
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
-    // Implement search functionality
-    console.log('Searching for:', searchQuery);
+    performSearch(searchQuery);
   };
+  
+  // Highlight matching text in search results
+  const highlightMatch = (text, query) => {
+    if (!text || !query) return text;
+    
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return parts.map((part, index) => 
+      part.toLowerCase() === query.toLowerCase() ? (
+        <span key={index} className="bg-yellow-200 dark:bg-yellow-900 font-semibold">{part}</span>
+      ) : (
+        part
+      )
+    );
+  };
+  
+  // Real-time search as user types (debounced)
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults(null);
+      return;
+    }
+    
+    // Debounce: wait 300ms after user stops typing
+    const timeoutId = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+  
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchResults(null);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -138,7 +253,7 @@ export default function Topbar({ onMenuToggle }) {
         </button>
 
         {/* Search bar */}
-        <div className="flex-1 max-w-2xl mx-4">
+        <div className="flex-1 max-w-2xl mx-4 relative" ref={searchRef}>
           <form onSubmit={handleSearch} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <BsSearch className="h-5 w-5 text-gray-400" />
@@ -146,11 +261,142 @@ export default function Topbar({ onMenuToggle }) {
             <input
               type="text"
               placeholder="Search tasks, messages, or users..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
+          
+          {/* Search Results Dropdown */}
+          {searchResults && (
+            <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50">
+              {isSearching ? (
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                  Searching...
+                </div>
+              ) : (
+                <>
+                  {/* Tasks */}
+                  {searchResults.tasks.length > 0 && (
+                    <div className="p-2">
+                      <h3 className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        📋 Tasks ({searchResults.tasks.length})
+                      </h3>
+                      {searchResults.tasks.map(task => (
+                        <button
+                          key={task.id}
+                          onClick={() => {
+                            navigate(`/tasks/${task.id}`);
+                            setSearchResults(null);
+                            setSearchQuery('');
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors border-l-2 border-transparent hover:border-blue-500"
+                        >
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {highlightMatch(task.task_title, searchQuery)}
+                          </div>
+                          {task.task_desc && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
+                              {highlightMatch(task.task_desc, searchQuery)}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              task.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                              task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                              'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            }`}>
+                              {task.priority}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              task.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                              task.status === 'in_progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                              'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
+                            }`}>
+                              {task.status.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Messages */}
+                  {searchResults.messages.length > 0 && (
+                    <div className="p-2 border-t border-gray-200 dark:border-gray-700">
+                      <h3 className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        💬 Messages ({searchResults.messages.length})
+                      </h3>
+                      {searchResults.messages.map(msg => (
+                        <button
+                          key={msg.id}
+                          onClick={() => {
+                            navigate('/messages');
+                            setSearchResults(null);
+                            setSearchQuery('');
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-md transition-colors border-l-2 border-transparent hover:border-purple-500"
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-semibold">
+                              {(msg.sender?.first_name?.[0] || 'U').toUpperCase()}
+                            </div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {highlightMatch(msg.sender?.first_name || 'Unknown', searchQuery)} {highlightMatch(msg.sender?.last_name || '', searchQuery)}
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate ml-10">
+                            {highlightMatch(msg.message_body, searchQuery)}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Users */}
+                  {searchResults.users.length > 0 && (
+                    <div className="p-2 border-t border-gray-200 dark:border-gray-700">
+                      <h3 className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        👥 Users ({searchResults.users.length})
+                      </h3>
+                      {searchResults.users.map(u => (
+                        <div
+                          key={u.id}
+                          className="px-3 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-md transition-colors border-l-2 border-transparent hover:border-green-500 cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold">
+                              {(u.first_name?.[0] || 'U').toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-white">
+                                {highlightMatch(u.first_name || '', searchQuery)} {highlightMatch(u.last_name || '', searchQuery)}
+                              </div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {highlightMatch(u.email, searchQuery)}
+                              </div>
+                            </div>
+                          </div>
+                          {u.department && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400 ml-10 mt-1">
+                              {u.department.name}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* No Results */}
+                  {searchResults.tasks.length === 0 && searchResults.messages.length === 0 && searchResults.users.length === 0 && (
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                      No results found for "{searchQuery}"
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right side icons */}

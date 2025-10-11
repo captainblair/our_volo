@@ -44,6 +44,15 @@ export default function MessagingPage(){
         new Date(a.timestamp) - new Date(b.timestamp)
       );
       setMessages(sortedMessages);
+      
+      // Mark all loaded messages as read
+      const readMessages = JSON.parse(localStorage.getItem('readMessages') || '[]');
+      const newReadMessages = [...new Set([...readMessages, ...sortedMessages.map(m => m.id)])];
+      localStorage.setItem('readMessages', JSON.stringify(newReadMessages));
+      
+      // Trigger notification count refresh
+      window.dispatchEvent(new Event('messagesRead'));
+      
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Error loading messages:', error);

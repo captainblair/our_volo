@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import CreateTaskModal from '../components/CreateTaskModal';
 
-export default function TasksPage() {
+export default function TasksPageSimple() {
   const { user } = useAuth();
   const navigate = useNavigate();
   

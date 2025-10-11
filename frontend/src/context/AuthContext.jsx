@@ -34,8 +34,10 @@ const hasPermission = (user, requiredRole) => {
     [ROLES.USER]: 0
   };
   
-  const userRoleLevel = roleHierarchy[user.role.toLowerCase()] || 0;
-  const requiredRoleLevel = roleHierarchy[requiredRole.toLowerCase()] || 0;
+  // Handle both object (user.role.name) and string (user.role) formats
+  const userRoleName = typeof user.role === 'object' ? user.role.name : user.role;
+  const userRoleLevel = roleHierarchy[(userRoleName || '').toLowerCase()] || 0;
+  const requiredRoleLevel = roleHierarchy[(requiredRole || '').toLowerCase()] || 0;
   
   return userRoleLevel >= requiredRoleLevel;
 };
