@@ -1,7 +1,16 @@
 from rest_framework import serializers
 from .models import Message
+from apps.users.serializers import UserSerializer
+
+class DepartmentSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
 
 class MessageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+    dept = DepartmentSerializer(read_only=True)
+    
     class Meta:
         model = Message
         fields = ['id','sender','receiver','dept','message_body','timestamp']

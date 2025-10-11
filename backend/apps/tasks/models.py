@@ -17,8 +17,8 @@ class Task(models.Model):
         ('high', 'High'),
     ]
     task_title = models.CharField(max_length=200)
-    task_desc = models.TextField()
-    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_tasks')
+    task_desc = models.TextField(blank=True, default='')
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='assigned_tasks', null=True, blank=True)
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_tasks')
     dept = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='tasks')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
