@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BsPeople, BsBuilding, BsShieldCheck, BsClipboardData, BsPencil, BsTrash } from 'react-icons/bs';
+import { BsPeople, BsBuilding, BsShieldCheck, BsClipboardData, BsPencil, BsTrash, BsChatDots } from 'react-icons/bs';
 import api from '../services/api';
 
 export default function AdminPage() {
@@ -10,6 +10,11 @@ export default function AdminPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
+  // Messaging state (admin)
+  const [selectedDeptId, setSelectedDeptId] = useState('all');
+  const [adminMessages, setAdminMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [msgSearch, setMsgSearch] = useState('');
 
   useEffect(() => {
     loadData();
@@ -35,6 +40,34 @@ export default function AdminPage() {
     }
   };
 
+  // Load messages for admin with optional department filter
+  const loadAdminMessages = async (deptId) => {
+    setLoadingMessages(true);
+    try {
+      const config = {};
+      if (deptId && deptId !== 'all') {
+        config.params = { dept_id: deptId };
+      }
+      const res = await api.get('/messaging/department/', config);
+      // Sort by newest first for overview
+      const data = Array.isArray(res.data) ? res.data.slice().sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp)) : [];
+      setAdminMessages(data);
+    } catch (e) {
+      console.error('Error loading admin messages', e);
+      setAdminMessages([]);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  // When switching to messages tab or department changes, load
+  useEffect(() => {
+    if (activeTab === 'messages') {
+      loadAdminMessages(selectedDeptId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, selectedDeptId]);
+
   const handleUpdateUser = async (userId, data) => {
     try {
       await api.post(`/users/manage/${userId}/assign_role/`, data);
@@ -51,6 +84,7 @@ export default function AdminPage() {
     { id: 'users', label: 'Users', icon: <BsPeople /> },
     { id: 'departments', label: 'Departments', icon: <BsBuilding /> },
     { id: 'roles', label: 'Roles', icon: <BsShieldCheck /> },
+    { id: 'messages', label: 'Messages', icon: <BsChatDots /> },
     { id: 'logs', label: 'Audit Logs', icon: <BsClipboardData /> }
   ];
 
@@ -153,6 +187,104 @@ export default function AdminPage() {
                           {user.role?.name || 'No Role'}
                         </span>
                       )}
+
+      {/* Messages Tab (Admin) */}
+      {activeTab === 'messages' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Sidebar: Departments */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 h-max">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Departments</h2>
+            <div className="space-y-2">
+              <button
+                onClick={() => setSelectedDeptId('all')}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedDeptId === 'all' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+              >
+                All Departments
+              </button>
+              {departments.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => setSelectedDeptId(String(d.id))}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${selectedDeptId === String(d.id) ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
+                >
+                  {d.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Content: Messages */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{selectedDeptId==='all' ? 'All Departments' : (departments.find(x=> String(x.id)===String(selectedDeptId))?.name || 'Department')} Messages</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{adminMessages.length} messages</p>
+              </div>
+              <div className="relative w-full md:w-72">
+                <input
+                  value={msgSearch}
+                  onChange={(e)=>setMsgSearch(e.target.value)}
+                  placeholder="Search messages..."
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+
+            {loadingMessages ? (
+              <div className="py-10 text-center text-gray-500 dark:text-gray-400">Loading messages...</div>
+            ) : adminMessages.length === 0 ? (
+              <div className="py-10 text-center text-gray-500 dark:text-gray-400">No messages found</div>
+            ) : (
+              <div className="space-y-6">
+                {/* If All selected, group by department */}
+                {selectedDeptId === 'all' ? (
+                  Object.entries(
+                    adminMessages.reduce((acc, m)=>{
+                      const key = m.dept?.name || 'Unknown Department';
+                      (acc[key] = acc[key] || []).push(m);
+                      return acc;
+                    }, {})
+                  ).map(([deptName, msgs]) => (
+                    <div key={deptName} className="border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <BsBuilding /> {deptName} <span className="text-xs text-gray-400">({msgs.length})</span>
+                      </div>
+                      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {msgs
+                          .filter(m => !msgSearch || m.message_body?.toLowerCase().includes(msgSearch.toLowerCase()) || m.sender?.first_name?.toLowerCase().includes(msgSearch.toLowerCase()))
+                          .map(m => (
+                          <div key={m.id} className="p-4 flex justify-between gap-4">
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{m.sender?.first_name || m.sender?.email || 'Unknown'}</div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{m.message_body}</div>
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(m.timestamp).toLocaleString()}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Single department list
+                  <div className="divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    {adminMessages
+                      .filter(m => !msgSearch || m.message_body?.toLowerCase().includes(msgSearch.toLowerCase()) || m.sender?.first_name?.toLowerCase().includes(msgSearch.toLowerCase()))
+                      .map(m => (
+                      <div key={m.id} className="p-4 flex justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{m.sender?.first_name || m.sender?.email || 'Unknown'}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{m.message_body}</div>
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(m.timestamp).toLocaleString()}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       {user.department?.name || 'No Department'}

@@ -262,17 +262,26 @@ export default function TasksPage() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    
     try {
+      const payload = {
+        task_title: formData.task_title,
+        task_desc: formData.task_desc,
+        assigned_to_id: formData.assigned_to ? parseInt(formData.assigned_to) : null,
+        due_date: formData.due_date || null,
+        priority: formData.priority,
+        status: formData.status,
+      };
+      
       if (formData.id) {
         // Update existing task
-        await api.put(`/tasks/${formData.id}/`, formData);
+        await api.put(`/tasks/${formData.id}/`, payload);
       } else {
         // Create new task
-        await api.post('/tasks/', {
-          ...formData,
-          assigned_by: user.id
-        });
+        await api.post('/tasks/', payload);
       }
+      
       setIsCreateModalOpen(false);
       setFormData({
         task_title: '',
@@ -286,7 +295,11 @@ export default function TasksPage() {
       await loadData();
     } catch (err) {
       console.error('Error saving task:', err);
-      setError('Failed to save task. Please try again.');
+      const errorMsg = err.response?.data?.detail || 
+                      err.response?.data?.non_field_errors?.[0] ||
+                      Object.values(err.response?.data || {})[0] ||
+                      'Failed to save task. Please try again.';
+      setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
     }
   };
   
@@ -795,6 +808,7 @@ export default function TasksPage() {
                   type="button"
                   onClick={() => {
                     setIsCreateModalOpen(false);
+                    setError(null);
                     setFormData({
                       task_title: '',
                       task_desc: '',
@@ -819,6 +833,20 @@ export default function TasksPage() {
                   <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
                     {formData.id ? 'Edit Task' : 'Create New Task'}
                   </h3>
+                  
+                  {error && (
+                    <div className="mt-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <BsXCircle className="h-5 w-5 text-red-400" />
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="mt-4">
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>

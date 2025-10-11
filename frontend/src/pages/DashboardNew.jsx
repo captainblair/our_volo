@@ -19,8 +19,14 @@ export default function Dashboard() {
       try {
         setLoading(true);
         const [tasksRes, messagesRes] = await Promise.all([
-          api.get('/tasks/'),
-          api.get('/messaging/department/')
+          api.get('/tasks/').catch(err => {
+            console.error('Error loading tasks:', err);
+            return { data: [] };
+          }),
+          api.get('/messaging/department/').catch(err => {
+            console.error('Error loading messages:', err);
+            return { data: [] };
+          })
         ]);
 
         const tasks = tasksRes.data || [];
@@ -38,9 +44,13 @@ export default function Dashboard() {
           dueDate: task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'
         })));
 
-        // Get recent messages (last 5) - filter out read messages
+        // Get recent messages (last 5) - filter out read messages and own messages
         const readMessages = JSON.parse(localStorage.getItem('readMessages') || '[]');
-        const unreadMessages = messages.filter(msg => !readMessages.includes(msg.id));
+        const currentUserEmail = token?.user?.email;
+        const unreadMessages = messages.filter(msg => 
+          !readMessages.includes(msg.id) && 
+          msg.sender?.email !== currentUserEmail // Don't show own messages
+        );
         setRecentMessages(unreadMessages.slice(0, 5).map(msg => ({
           ...msg,
           timestamp: format(new Date(msg.timestamp), 'MMM dd, yyyy HH:mm')
@@ -53,7 +63,7 @@ export default function Dashboard() {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [token]);
 
   const handleTaskClick = (taskId) => {
     navigate(`/tasks/${taskId}`);

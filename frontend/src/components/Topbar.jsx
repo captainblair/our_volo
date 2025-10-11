@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { BsList, BsBell, BsSearch, BsChatSquareText, BsSun, BsMoon, BsCamera } from 'react-icons/bs';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const API_BASE_URL = 'http://localhost:8000'; // Update this with your backend URL
 
@@ -10,12 +11,58 @@ export default function Topbar({ onMenuToggle }) {
   const { user, logout, updateUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notificationCount] = useState(3); // Example count
+  const [notificationCount, setNotificationCount] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
+  // Load unread message count
+  useEffect(() => {
+    const loadNotificationCount = async () => {
+      try {
+        const response = await api.get('/messaging/department/');
+        const messages = response.data || [];
+        
+        // Get read messages from localStorage
+        const readMessages = JSON.parse(localStorage.getItem('readMessages') || '[]');
+        const currentUserEmail = user?.email;
+        
+        // Check if user is admin
+        const isAdmin = user?.role?.name?.toLowerCase() === 'admin';
+        
+        // Count unread messages
+        let unreadCount = 0;
+        
+        if (isAdmin) {
+          // Admin sees all unread messages from all departments (except own)
+          unreadCount = messages.filter(msg => 
+            !readMessages.includes(msg.id) && 
+            msg.sender?.email !== currentUserEmail
+          ).length;
+        } else {
+          // Regular users see unread messages from their department only (except own)
+          unreadCount = messages.filter(msg => 
+            !readMessages.includes(msg.id) && 
+            msg.sender?.email !== currentUserEmail
+          ).length;
+        }
+        
+        setNotificationCount(unreadCount);
+      } catch (error) {
+        console.error('Error loading notification count:', error);
+      }
+    };
+
+    if (user) {
+      loadNotificationCount();
+      
+      // Refresh count every 30 seconds
+      const interval = setInterval(loadNotificationCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -123,8 +170,8 @@ export default function Topbar({ onMenuToggle }) {
           
           {/* Messages */}
           <button 
-            onClick={() => window.location.href = '/messages'}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+            onClick={() => navigate('/messages')}
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
           >
             <BsChatSquareText className="h-5 w-5" />
             <span className="sr-only">Messages</span>
@@ -133,12 +180,13 @@ export default function Topbar({ onMenuToggle }) {
           {/* Notifications */}
           <button 
             className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
-            onClick={() => setNotificationCount(0)}
+            onClick={() => navigate('/messages')}
+            title={`${notificationCount} unread message${notificationCount !== 1 ? 's' : ''}`}
           >
             <BsBell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
+            <span className="sr-only">Notifications ({notificationCount})</span>
             {notificationCount > 0 && (
-              <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full">
+              <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full animate-pulse">
                 {notificationCount > 9 ? '9+' : notificationCount}
               </span>
             )}

@@ -114,17 +114,17 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Settings</h1>
       
-      <div className="bg-white rounded-xl shadow-card overflow-hidden">
-        <div className="border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card overflow-hidden">
+        <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="flex -mb-px">
             <button
               onClick={() => setActiveTab('account')}
               className={`py-4 px-6 text-sm font-medium ${
                 activeTab === 'account'
-                  ? 'border-b-2 border-primary-500 text-primary-600'
-                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               Account
@@ -133,8 +133,8 @@ export default function SettingsPage() {
               onClick={() => setActiveTab('notifications')}
               className={`py-4 px-6 text-sm font-medium ${
                 activeTab === 'notifications'
-                  ? 'border-b-2 border-primary-500 text-primary-600'
-                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               Notifications
@@ -143,8 +143,8 @@ export default function SettingsPage() {
               onClick={() => setActiveTab('security')}
               className={`py-4 px-6 text-sm font-medium ${
                 activeTab === 'security'
-                  ? 'border-b-2 border-primary-500 text-primary-600'
-                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               Security
@@ -157,8 +157,8 @@ export default function SettingsPage() {
             <div 
               className={`mb-6 p-4 rounded-md ${
                 message.type === 'error' 
-                  ? 'bg-red-100 text-red-700' 
-                  : 'bg-green-100 text-green-700'
+                  ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' 
+                  : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
               }`}
             >
               {message.text}
@@ -168,40 +168,40 @@ export default function SettingsPage() {
           {activeTab === 'account' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Account Information</h2>
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Account Information</h2>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-gray-500">Name</p>
-                      <p className="font-medium">{user?.first_name} {user?.last_name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Name</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user?.first_name} {user?.last_name}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{user?.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user?.email}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Role</p>
-                      <p className="font-medium capitalize">{user?.role?.name || 'User'}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
+                      <p className="font-medium capitalize text-gray-900 dark:text-white">{user?.role?.name || 'User'}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Department</p>
-                      <p className="font-medium">{user?.department?.name || 'Not assigned'}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{user?.department?.name || 'Not assigned'}</p>
                     </div>
                   </div>
                 </div>
               </div>
               
               <div className="pt-4">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Account Preferences</h2>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Account Preferences</h2>
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <input
                       id="dark-mode"
                       name="dark-mode"
                       type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
-                    <label htmlFor="dark-mode" className="ml-3 block text-sm font-medium text-gray-700">
+                    <label htmlFor="dark-mode" className="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Dark Mode
                     </label>
                   </div>
@@ -210,9 +210,9 @@ export default function SettingsPage() {
                       id="compact-view"
                       name="compact-view"
                       type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
-                    <label htmlFor="compact-view" className="ml-3 block text-sm font-medium text-gray-700">
+                    <label htmlFor="compact-view" className="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Compact View
                     </label>
                   </div>
@@ -223,10 +223,10 @@ export default function SettingsPage() {
           
           {activeTab === 'security' && (
             <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-md">
-              <h2 className="text-lg font-medium text-gray-900">Change Password</h2>
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Change Password</h2>
               
               <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Current Password
                 </label>
                 <div className="mt-1">
@@ -238,13 +238,13 @@ export default function SettingsPage() {
                     required
                     value={passwordForm.currentPassword}
                     onChange={handlePasswordChange}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
               </div>
               
               <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   New Password
                 </label>
                 <div className="mt-1">
@@ -256,16 +256,16 @@ export default function SettingsPage() {
                     required
                     value={passwordForm.newPassword}
                     onChange={handlePasswordChange}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Must be at least 8 characters long
                 </p>
               </div>
               
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Confirm New Password
                 </label>
                 <div className="mt-1">
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                     required
                     value={passwordForm.confirmPassword}
                     onChange={handlePasswordChange}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
               </div>
@@ -296,8 +296,8 @@ export default function SettingsPage() {
           
           {activeTab === 'notifications' && (
             <form onSubmit={handleNotificationSubmit} className="space-y-6">
-              <h2 className="text-lg font-medium text-gray-900">Notification Preferences</h2>
-              <p className="text-sm text-gray-500">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">Notification Preferences</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Manage how you receive notifications from our system.
               </p>
               
@@ -310,14 +310,14 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.emailNotifications}
                       onChange={handleNotificationChange}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="email-notifications" className="font-medium text-gray-700">
+                    <label htmlFor="email-notifications" className="font-medium text-gray-700 dark:text-gray-300">
                       Email Notifications
                     </label>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Receive important updates and announcements via email.
                     </p>
                   </div>
@@ -331,14 +331,14 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.taskReminders}
                       onChange={handleNotificationChange}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="task-reminders" className="font-medium text-gray-700">
+                    <label htmlFor="task-reminders" className="font-medium text-gray-700 dark:text-gray-300">
                       Task Reminders
                     </label>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Get reminders for upcoming and overdue tasks.
                     </p>
                   </div>
@@ -352,14 +352,14 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.messageAlerts}
                       onChange={handleNotificationChange}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="message-alerts" className="font-medium text-gray-700">
+                    <label htmlFor="message-alerts" className="font-medium text-gray-700 dark:text-gray-300">
                       New Message Alerts
                     </label>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Receive notifications for new messages.
                     </p>
                   </div>
@@ -373,14 +373,14 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.weeklyReports}
                       onChange={handleNotificationChange}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="weekly-reports" className="font-medium text-gray-700">
+                    <label htmlFor="weekly-reports" className="font-medium text-gray-700 dark:text-gray-300">
                       Weekly Reports
                     </label>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Receive a weekly summary of your activities.
                     </p>
                   </div>

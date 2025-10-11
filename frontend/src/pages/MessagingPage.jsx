@@ -2,37 +2,69 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import useNotifications from '../hooks/useNotifications';
-import { BsSend, BsPeople, BsChatDots } from 'react-icons/bs';
+import { BsSend, BsPeople, BsChatDots, BsFilter } from 'react-icons/bs';
 
 export default function MessagingPage(){
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState([]);
+  const [selectedDept, setSelectedDept] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const load = async () => {
+  useEffect(() => {
+    // Check if user is admin
+    const roleCheck = user?.role?.name?.toLowerCase() === 'admin';
+    setIsAdmin(roleCheck);
+    
+    // Load departments if admin
+    if (roleCheck) {
+      api.get('/departments/').then(res => {
+        setDepartments(res.data || []);
+      }).catch(err => console.error('Error loading departments:', err));
+    }
+  }, [user]);
+
+  const load = async (deptId = selectedDept) => {
     try {
-      const response = await api.get('/messaging/department/');
+      setLoading(true);
+      const config = {};
+      if (isAdmin && deptId && deptId !== 'all') {
+        config.params = { dept_id: deptId };
+      }
+      const response = await api.get('/messaging/department/', config);
       // Sort messages by timestamp (oldest first for chat)
       const sortedMessages = (response.data || []).sort((a, b) => 
         new Date(a.timestamp) - new Date(b.timestamp)
       );
       setMessages(sortedMessages);
-      setLoading(false);
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Error loading messages:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
-  useNotifications(useCallback(() => { load(); }, []));
+  useEffect(() => { 
+    if (isAdmin !== null) {
+      load(); 
+    }
+  }, [isAdmin]);
+  
+  useEffect(() => {
+    if (isAdmin && selectedDept !== '') {
+      load(selectedDept);
+    }
+  }, [selectedDept]);
+  
+  useNotifications(useCallback(() => { load(); }, [selectedDept]));
 
   const send = async (e) => {
     e.preventDefault();
@@ -71,23 +103,41 @@ export default function MessagingPage(){
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
               <BsPeople className="h-5 w-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
-                {user?.department?.name || 'Department'} Chat
+                {isAdmin && selectedDept && selectedDept !== 'all' 
+                  ? departments.find(d => String(d.id) === selectedDept)?.name || 'Department'
+                  : isAdmin && selectedDept === 'all'
+                  ? 'All Departments'
+                  : user?.department?.name || 'Department'} Chat
               </h1>
               <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                 {messages.length} messages
               </p>
             </div>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            <BsChatDots className="h-5 w-5" />
-          </div>
+          
+          {/* Admin Department Filter */}
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <BsFilter className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              <select
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Departments</option>
+                {departments.map(dept => (
+                  <option key={dept.id} value={dept.id}>{dept.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
