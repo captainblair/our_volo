@@ -12,6 +12,7 @@ from .serializers import (
     ProfilePictureSerializer
 )
 from .permissions import IsAdmin
+from .validators import FileValidator
 
 User = get_user_model()
 
@@ -98,18 +99,11 @@ def upload_profile_picture(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Validate file size (max 2MB)
-    if request.FILES['profile_picture'].size > 2 * 1024 * 1024:
+    # Validate file using the validator utility
+    is_valid, error_message = FileValidator.validate_image_file(request.FILES['profile_picture'])
+    if not is_valid:
         return Response(
-            {'error': 'File size should not exceed 2MB'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # Validate file type
-    allowed_types = ['image/jpeg', 'image/png', 'image/gif']
-    if request.FILES['profile_picture'].content_type not in allowed_types:
-        return Response(
-            {'error': 'Only JPEG, PNG, and GIF images are allowed'}, 
+            {'error': error_message}, 
             status=status.HTTP_400_BAD_REQUEST
         )
     
