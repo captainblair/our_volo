@@ -1,79 +1,85 @@
 import logging
 from django.conf import settings
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .authentication import EmailTokenObtainPairSerializer
 
-DEBUG = getattr(settings, 'DEBUG', False)
-
+# Setup logger
 logger = logging.getLogger(__name__)
 
 class EmailTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom token obtain view that authenticates users by email instead of username.
+    Includes detailed logging for debugging and error tracking.
+    """
     serializer_class = EmailTokenObtainPairSerializer
-    
+
     def post(self, request, *args, **kwargs):
-        # Log the raw request data
-        logger.info(f"Raw request data: {request.data}")
-        logger.info(f"Request content type: {request.content_type}")
-        
-        # Handle both form data and JSON
+        logger.info("🔐 Login request received")
+
+        # Log the request content type and data
+        logger.debug(f"Request content type: {request.content_type}")
+        logger.debug(f"Raw request data: {request.data}")
+
+        # Handle both JSON and form-encoded requests
         if request.content_type == 'application/x-www-form-urlencoded':
             email = request.POST.get('email') or request.data.get('email')
             password = request.POST.get('password') or request.data.get('password')
         else:
             email = request.data.get('email')
             password = request.data.get('password')
-            
+
         logger.info(f"Login attempt for email: {email}")
-        
-        try:
-            # Log the incoming request data
-            logger.debug(f"Request data: {request.data}")
-            logger.debug(f"Request POST: {request.POST}")
-            
-            # Try to get the user for additional context
-            try:
-                from django.contrib.auth import get_user_model
-                User = get_user_model()
-                user = User.objects.get(email=email) if email else None
-                if user:
-                    logger.info(f"User found: {user.email}, is_active: {user.is_active}")
-                    # Verify password
-                    if not user.check_password(password):
-                        logger.warning(f"Invalid password for user: {email}")
-                        return Response(
-                            {"detail": "Invalid email or password"},
-                            status=status.HTTP_401_UNAUTHORIZED
-                        )
-                else:
-                    logger.warning(f"No user found with email: {email}")
-                    return Response(
-                        {"detail": "Invalid email or password"},
-                        status=status.HTTP_401_UNAUTHORIZED
-                    )
-            except Exception as user_lookup_error:
-                logger.error(f"Error looking up user: {str(user_lookup_error)}", exc_info=True)
-                return Response(
-                    {"detail": "Error during authentication"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            
-            # Attempt authentication
-            logger.info("Attempting authentication...")
-            response = super().post(request, *args, **kwargs)
-            logger.info(f"Authentication successful for user: {email}")
-            return response
-            
-        except Exception as e:
-            logger.error(f"Login error: {str(e)}", exc_info=True)
-            logger.error(f"Request data: {request.data}")
-            logger.error(f"Request headers: {request.headers}")
-            
-            if DEBUG:
-                raise
-                
+
+        # Validate that email and password were provided
+        if not email or not password:
+            logger.warning("Email or password not provided in request")
             return Response(
-                {"detail": "An error occurred during authentication"},
+                {"detail": "Email and password are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        User = get_user_model()
+
+        try:
+            user = User.objects.get(email=email)
+            logger.debug(f"User found: {user.email}, active: {user.is_active}")
+
+            # Validate password
+            if not user.check_password(password):
+                logger.warning(f"Invalid password for user: {email}")
+                return Response(
+                    {"detail": "Invalid email or password"},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+        except User.DoesNotExist:
+            logger.warning(f"No user found with email: {email}")
+            return Response(
+                {"detail": "Invalid email or password"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Exception as user_error:
+            logger.error(f"Unexpected error during user lookup: {user_error}", exc_info=True)
+            return Response(
+                {"detail": "Error during authentication process"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        # Try generating JWT token via SimpleJWT
+        try:
+            logger.info(f"Authenticating user {email} through SimpleJWT serializer...")
+            response = super().post(request, *args, **kwargs)
+            logger.info(f"✅ Authentication successful for user: {email}")
+            return response
+
+        except Exception as e:
+            logger.error(f"JWT generation error for {email}: {e}", exc_info=True)
+            if getattr(settings, 'DEBUG', False):
+                raise
+            return Response(
+                {"detail": "An internal authentication error occurred"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
