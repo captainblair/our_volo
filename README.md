@@ -93,7 +93,7 @@ A production-ready internal web application designed to bridge communication gap
 
 ---
 
-## 📦 Prerequisites
+##  Prerequisites
 
 Before running this project locally, ensure you have the following installed:
 
@@ -218,13 +218,13 @@ The frontend should now be running at: **http://localhost:5173**
 
 ---
 
-## 🔑 Default Credentials
+##  Default Credentials
 
 After importing the seed data, you can log in with these default accounts:
 
 ### Admin Account
-- **Email**: `admin@volo.com`
-- **Password**: `admin123`
+- **Email**: `admin@voloafrica.com`
+- **Password**: `Admin@123`
 - **Role**: Admin
 - **Department**: IT
 
@@ -240,11 +240,11 @@ After importing the seed data, you can log in with these default accounts:
 - **Role**: Staff
 - **Department**: Finance
 
-**⚠️ Important**: Change these passwords immediately after first login in a production environment!
+** Important**: Change these passwords immediately after first login in a production environment!
 
 ---
 
-## 🎯 Key Features Explained
+##  Key Features Explained
 
 ### 1. User Registration & Login
 
@@ -332,7 +332,7 @@ After importing the seed data, you can log in with these default accounts:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 our_volo/
@@ -373,7 +373,7 @@ our_volo/
 
 ---
 
-## 📚 API Documentation
+##  API Documentation
 
 ### Authentication Endpoints
 
@@ -427,7 +427,7 @@ For detailed API examples, see `docs/API_DOCS.md`
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Backend Issues
 
@@ -503,7 +503,7 @@ For detailed API examples, see `docs/API_DOCS.md`
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 This project was developed as part of the Software Development Laboratory course at Technical University of Kenya.
 
@@ -524,7 +524,7 @@ This project is developed for educational purposes at Technical University of Ke
 
 ---
 
-## 👥 Team
+##  Team
 
 **Course**: IBL 2305 – Software Development Laboratory  
 **Institution**: Technical University of Kenya  
@@ -532,7 +532,7 @@ This project is developed for educational purposes at Technical University of Ke
 
 ---
 
-## 📞 Support
+##  Support
 
 If you encounter any issues not covered in this README:
 
@@ -543,7 +543,7 @@ If you encounter any issues not covered in this README:
 
 ---
 
-## 🎓 Acknowledgments
+##  Acknowledgments
 
 - Technical University of Kenya
 - Software Development Laboratory Course Instructors
@@ -551,4 +551,4 @@ If you encounter any issues not covered in this README:
 
 ---
 
-**Happy Coding! 🚀**
+**Happy Coding! **
