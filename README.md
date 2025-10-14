@@ -118,7 +118,7 @@ Before running this project locally, ensure you have the following installed:
 
 ---
 
-## 🚀 Installation
+##  Installation
 
 ### Step 1: Clone the Repository
 
