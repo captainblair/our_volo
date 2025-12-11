@@ -87,12 +87,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             username = f"{original_username}{counter}"
             counter += 1
         
-        # Assign default "Employee" role to new users
+        # Assign default "Staff" role to new users
         try:
-            employee_role = Role.objects.get(name='Employee')
-            validated_data['role'] = employee_role
+            staff_role = Role.objects.get(name='Staff')
+            validated_data['role'] = staff_role
         except Role.DoesNotExist:
-            pass  # If Employee role doesn't exist, user will have no role
+            pass  # If Staff role doesn't exist, user will have no role
         
         user = User(username=username, **validated_data)
         user.set_password(password)
