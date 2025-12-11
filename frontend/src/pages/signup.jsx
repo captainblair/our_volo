@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import salahImage from "../media/salah-regouane-Y2ZS27IE0Xo-unsplash.jpg";
 
 const API_BASE_URL = "http://localhost:8000";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -134,22 +136,42 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-stretch bg-gray-100" style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-      <div className="absolute inset-0 bg-black/50 z-0"></div>
+    <div className={`min-h-screen flex items-stretch transition-colors ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
+    }`} style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+      <div className={`absolute inset-0 z-0 ${
+        theme === 'dark' ? 'bg-black/70' : 'bg-black/50'
+      }`}></div>
       
       <div className="w-full md:w-1/2 p-8 flex items-center justify-start z-10">
-        <form onSubmit={handleSignup} className="bg-white bg-opacity-95 p-8 rounded-2xl shadow-xl w-full max-w-md">
-          <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Create an Account</h1>
-          <p className="text-sm text-gray-700 text-center mb-6">
+        <form onSubmit={handleSignup} className={`p-8 rounded-2xl shadow-xl w-full max-w-md transition-colors ${
+          theme === 'dark'
+            ? 'bg-gray-800/95 backdrop-blur-md border border-gray-700'
+            : 'bg-white/95 backdrop-blur-md'
+        }`}>
+          <h1 className={`text-2xl font-bold text-center mb-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>Create an Account</h1>
+          <p className={`text-sm text-center mb-6 ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>
             Please create an account using your official names. The name you enter here will appear on your certificate upon completion.
           </p>
           
-          {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</div>}
+          {error && <div className={`text-red-600 text-sm p-2 rounded mb-4 ${
+            theme === 'dark' ? 'bg-red-900/20' : 'bg-red-50'
+          }`}>{error}</div>}
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">First Name</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>First Name</label>
             <input
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
               placeholder="Enter your first name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -157,10 +179,16 @@ export default function Signup() {
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Last Name</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Last Name</label>
             <input
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
               placeholder="Enter your last name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -168,11 +196,17 @@ export default function Signup() {
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Email</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Email</label>
             <input
               type="email"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -186,28 +220,42 @@ export default function Signup() {
                 checked={subscribeEmails}
                 onChange={(e) => setSubscribeEmails(e.target.checked)}
               />
-              <label htmlFor="subscribe_emails" className="ml-2 text-sm text-gray-700">
+              <label htmlFor="subscribe_emails" className={`ml-2 text-sm ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 I confirm my subscription to receive program-related emails.
               </label>
             </div>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Phone Number</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Phone Number</label>
             <input
               type="tel"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="+1 (201) 555-0123"
+              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
+              placeholder="+254 700 000 000"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Department</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Department</label>
             <select
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white'
+                  : 'border-gray-300 bg-white text-gray-900'
+              }`}
               value={departmentId}
               onChange={(e) => setDepartmentId(e.target.value)}
               required
@@ -219,12 +267,18 @@ export default function Signup() {
             </select>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Password</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full border rounded px-3 py-2 pr-16 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                  theme === 'dark'
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                }`}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -233,25 +287,35 @@ export default function Signup() {
               <button
                 type="button"
                 onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-gray-600 hover:text-gray-900 bg-transparent"
+                className={`absolute inset-y-0 right-0 flex items-center pr-3 text-sm transition-colors ${
+                  theme === 'dark'
+                    ? 'text-gray-400 hover:text-gray-200'
+                    : 'text-gray-600 hover:text-gray-900'
+                } bg-transparent`}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className={`text-xs mt-0.5 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               Min 8 chars, 1 uppercase, 1 special char
             </p>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-800 mb-1">Password Confirmation</label>
+          <div className="mb-4">
+            <label className={`block text-sm font-medium mb-1 ${
+              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+            }`}>Password Confirmation</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className={`w-full border rounded px-3 py-2 pr-20 focus:outline-none focus:ring-2 ${
+                className={`w-full border rounded px-3 py-2 pr-20 focus:outline-none focus:ring-2 transition-colors ${
                   passwordMatch === true ? 'border-green-500 focus:ring-green-500' : 
                   passwordMatch === false ? 'border-red-500 focus:ring-red-500' : 
-                  'border-gray-300 focus:ring-blue-500'
+                  theme === 'dark'
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-blue-500'
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:ring-blue-500'
                 }`}
                 placeholder="Confirm your password"
                 value={confirmPassword}
@@ -268,7 +332,11 @@ export default function Signup() {
                 <button
                   type="button"
                   onClick={toggleShowPassword}
-                  className="text-sm text-gray-600 hover:text-gray-900 bg-transparent"
+                  className={`text-sm transition-colors ${
+                    theme === 'dark'
+                      ? 'text-gray-400 hover:text-gray-200'
+                      : 'text-gray-600 hover:text-gray-900'
+                  } bg-transparent`}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -282,7 +350,7 @@ export default function Signup() {
             )}
           </div>
           
-          <div className="flex items-center">
+          <div className="flex items-center mb-4">
             <input
               id="terms"
               type="checkbox"
@@ -291,25 +359,41 @@ export default function Signup() {
               onChange={(e) => setAgreeTerms(e.target.checked)}
               required
             />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-              I have read and agree to the <a href="#" className="text-blue-600 hover:text-blue-800">terms and conditions</a>
+            <label htmlFor="terms" className={`ml-2 block text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              I have read and agree to the <a href="#" className={`transition-colors ${
+                theme === 'dark'
+                  ? 'text-blue-400 hover:text-blue-300'
+                  : 'text-blue-600 hover:text-blue-800'
+              }`}>terms and conditions</a>
             </label>
           </div>
           
           <button 
             type="submit"
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition-colors disabled:opacity-50 mt-4" 
+            className={`w-full py-2 rounded transition-colors disabled:opacity-50 mt-4 ${
+              theme === 'dark'
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-black text-white hover:bg-gray-800'
+            }`}
             disabled={loading}
           >
             {loading ? "Creating Account..." : "Sign Up"}
           </button>
           
-          <p className="text-sm text-gray-700 text-center mt-4">
+          <p className={`text-sm text-center mt-4 ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>
             Already have an account?{" "}
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className={`font-medium transition-colors ${
+                theme === 'dark'
+                  ? 'text-blue-400 hover:text-blue-300'
+                  : 'text-blue-600 hover:text-blue-800'
+              }`}
             >
               Login
             </button>

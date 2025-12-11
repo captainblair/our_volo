@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { BsList, BsX } from 'react-icons/bs';
+import { BsList, BsX, BsSun, BsMoon } from 'react-icons/bs';
 
 export default function PublicLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -110,7 +110,14 @@ export default function PublicLayout() {
           </button>
         </div>
         
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex space-x-4 items-center">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <BsSun className="h-5 w-5" /> : <BsMoon className="h-5 w-5" />}
+          </button>
           <button 
             onClick={() => navigate('/login')}
             className="px-4 py-2 text-orange-600 dark:text-orange-400 border border-orange-600 dark:border-orange-400 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors"
@@ -205,6 +212,16 @@ export default function PublicLayout() {
             </button>
             
             <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => {
+                  toggleTheme();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full mb-3 px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-center flex items-center justify-center space-x-2"
+              >
+                {theme === 'dark' ? <BsSun className="h-4 w-4" /> : <BsMoon className="h-4 w-4" />}
+                <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
               <button 
                 onClick={() => {
                   navigate('/login');

@@ -33,13 +33,13 @@ function PrivateRoute() {
 
 // Public route component
 function PublicRoute() {
-  const { token } = useAuth();
-  // Only redirect to dashboard if user is trying to access login/signup when already authenticated
-  const location = window.location.pathname;
-  if (token && (location === '/login' || location === '/signup' || location === '/')) {
-    return <Navigate to="/dashboard" replace />;
-  }
   return <PublicLayout><Outlet /></PublicLayout>;
+}
+
+// Protected public route component (redirects if authenticated)
+function ProtectedPublicRoute({ children }) {
+  const { token } = useAuth();
+  return token ? <Navigate to="/dashboard" replace /> : children;
 }
 
 const App = () => (
@@ -49,9 +49,9 @@ const App = () => (
       <Routes>
         {/* Public routes */}
         <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<ProtectedPublicRoute><Login /></ProtectedPublicRoute>} />
+          <Route path="/signup" element={<ProtectedPublicRoute><Signup /></ProtectedPublicRoute>} />
+          <Route path="/" element={<ProtectedPublicRoute><HomePage /></ProtectedPublicRoute>} />
           <Route path="/about" element={<div className="container mx-auto p-4">About Us Page</div>} />
           <Route path="/features" element={<div className="container mx-auto p-4">Features Page</div>} />
           <Route path="/pricing" element={<div className="container mx-auto p-4">Pricing Page</div>} />

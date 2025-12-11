@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   
   // Load saved credentials if Remember Me was checked
   const savedEmail = localStorage.getItem('rememberedEmail') || "";
@@ -56,8 +59,16 @@ export default function Login() {
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
+  const handleGoogleLogin = () => {
+    alert('Google login integration coming soon! Please use email/password for now.');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center bg-gradient-to-r from-blue-900 to-gray-800 text-white px-4 py-8">
+    <div className={`min-h-screen flex flex-col md:flex-row items-center justify-center px-4 py-8 transition-colors ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-r from-gray-900 to-gray-800 text-white' 
+        : 'bg-gradient-to-r from-blue-900 to-gray-800 text-white'
+    }`}>
       {/* Left Side Content */}
       <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center mb-8 md:mb-0">
         <div className="text-center max-w-md">
@@ -69,9 +80,15 @@ export default function Login() {
 
       {/* Right Side Form */}
       <div className="w-full md:w-1/2 p-4 md:p-8 flex items-center justify-center">
-        <div className="bg-white/80 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md">
-          <h1 className="text-2xl font-semibold mb-6 text-gray-900 text-center">Sign In</h1>
-          {error && <div className="text-red-600 text-sm mb-4 text-center">{error}</div>}
+        <div className={`p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md transition-colors ${
+          theme === 'dark'
+            ? 'bg-gray-800/90 backdrop-blur-md border border-gray-700'
+            : 'bg-white/90 backdrop-blur-md'
+        }`}>
+          <h1 className={`text-2xl font-semibold mb-6 text-center ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Sign In</h1>
+          {error && <div className="text-red-600 text-sm mb-4 text-center bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</div>}
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -133,9 +150,41 @@ export default function Login() {
                 </button>
               </div>
             </div>
+            {/* Google Login Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className={`w-full mb-3 py-2 px-4 border rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+                theme === 'dark'
+                  ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <FcGoogle className="h-5 w-5" />
+              <span>Continue with Google</span>
+            </button>
+            
+            {/* Divider */}
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className={`w-full border-t ${
+                  theme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+                }`}></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className={`px-2 ${
+                  theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+                }`}>Or continue with email</span>
+              </div>
+            </div>
+            
             <button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              className={`w-full py-2 rounded-lg transition-colors ${
+                theme === 'dark'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-black text-white hover:bg-gray-800'
+              }`}
               disabled={loading}
             >
               {loading ? "Logging in..." : "Sign In"}

@@ -324,6 +324,8 @@ export function AuthProvider({ children }) {
     // Clear tokens from storage
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('rememberedEmail');
+    localStorage.removeItem('rememberMe');
     
     // Clear auth header
     delete api.defaults.headers.common['Authorization'];
@@ -332,6 +334,9 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
     setError(null);
+    setUserRoles([]);
+    setUserDepartments([]);
+    setPermissions({});
   }, []);
 
   /**

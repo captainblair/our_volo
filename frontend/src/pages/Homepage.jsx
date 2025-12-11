@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import videoSource from "../media/11269279-uhd_3840_2160_24fps.mp4";
 import volovolovolo from "../media/volovolovolo.avif";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,11 @@ const API_BASE_URL = "http://localhost:8000"; // Django backend URL
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState("home");
   const { logout } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
+  
+  // Debug log to check theme
+  console.log('Homepage theme:', theme);
 
   const slide = {
     image: volovolovolo,
@@ -57,7 +62,9 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className={`flex flex-col min-h-screen transition-colors ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-white'
+    }`}>
 
       {/* Hero Section with Static Image */}
       <section id="home" className="relative w-full h-screen overflow-hidden">
@@ -105,61 +112,105 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 px-4 bg-white">
+      <section id="features" className={`py-16 px-4 transition-colors ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">Streamline Your Department Communication</h2>
-          <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-12">
+          <h2 className={`text-3xl font-bold text-center mb-4 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>Streamline Your Department Communication</h2>
+          <p className={`text-lg text-center max-w-3xl mx-auto mb-12 ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             Our platform is specifically designed to address the communication challenges faced by companies like Volo Africa
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-orange-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-orange-50'
+            }`}>
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
+                theme === 'dark' ? 'bg-orange-600' : 'bg-orange-100'
+              }`}>
+                <svg className={`w-6 h-6 ${
+                  theme === 'dark' ? 'text-white' : 'text-orange-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Real-time Communication</h3>
-              <p className="text-gray-600">Chat instantly with team members across departments with our integrated messaging system.</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Real-time Communication</h3>
+              <p className={`${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}>Chat instantly with team members across departments with our integrated messaging system.</p>
             </div>
             
-            <div className="bg-green-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'
+            }`}>
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
+                theme === 'dark' ? 'bg-green-600' : 'bg-green-100'
+              }`}>
+                <svg className={`w-6 h-6 ${
+                  theme === 'dark' ? 'text-white' : 'text-green-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Task Management</h3>
-              <p className="text-gray-600">Assign, track, and manage tasks efficiently with role-based allocation and progress monitoring.</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Task Management</h3>
+              <p className={`${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}>Assign, track, and manage tasks efficiently with role-based allocation and progress monitoring.</p>
             </div>
             
-            <div className="bg-blue-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50'
+            }`}>
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
+                theme === 'dark' ? 'bg-blue-600' : 'bg-blue-100'
+              }`}>
+                <svg className={`w-6 h-6 ${
+                  theme === 'dark' ? 'text-white' : 'text-blue-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Performance Analytics</h3>
-              <p className="text-gray-600">Gain insights into team performance, task completion rates, and departmental efficiency.</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Performance Analytics</h3>
+              <p className={`${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+              }`}>Gain insights into team performance, task completion rates, and departmental efficiency.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 bg-black text-white">
+      <section className={`py-16 px-4 transition-colors ${
+        theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-black text-white'
+      }`}>
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center">
           <div>
             <p className="text-5xl font-bold text-orange-600 mb-2">89%</p>
-            <p className="text-lg text-white">Increase in inter-department communication efficiency</p>
+            <p className={`text-lg ${
+              theme === 'dark' ? 'text-gray-100' : 'text-white'
+            }`}>Increase in inter-department communication efficiency</p>
           </div>
           <div>
             <p className="text-5xl font-bold text-orange-600 mb-2">42%</p>
-            <p className="text-lg text-white">Reduction in task completion time</p>
+            <p className={`text-lg ${
+              theme === 'dark' ? 'text-gray-100' : 'text-white'
+            }`}>Reduction in task completion time</p>
           </div>
           <div>
             <p className="text-5xl font-bold text-orange-600 mb-2">76%</p>
-            <p className="text-lg text-white">Decrease in misallocated tasks</p>
+            <p className={`text-lg ${
+              theme === 'dark' ? 'text-gray-100' : 'text-white'
+            }`}>Decrease in misallocated tasks</p>
           </div>
         </div>
       </section>
