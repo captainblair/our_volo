@@ -133,12 +133,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">Manage your personal information</p>
           </div>
           {!isEditing ? (
@@ -184,7 +184,7 @@ export default function ProfilePage() {
         {/* Profile Picture Section */}
         <div className="mb-6 flex flex-col items-center">
           <div className="relative">
-            <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
               {picturePreview || user.profile_picture ? (
                 <img 
                   src={picturePreview || user.profile_picture} 
@@ -223,7 +223,7 @@ export default function ProfilePage() {
         {/* Content */}
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   First Name *
@@ -314,7 +314,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Info Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
               <div>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</h3>
                 <p className="mt-1 text-gray-900 dark:text-white">{user.email}</p>

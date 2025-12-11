@@ -38,7 +38,7 @@ const NavItem = ({ to, icon, label, badge, isActive, onClick, className = '' }) 
         className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-left ${
           isActive
             ? 'bg-primary-600 text-white'
-            : `text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 ${className}`
+            : `text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-800 ${className}`
         }`}
       >
         <div className="flex items-center">
@@ -146,7 +146,7 @@ export default function Sidebar() {
   return (
     <aside className={`w-64 h-full flex flex-col border-r transition-colors duration-200 ${
       theme === 'dark' 
-        ? 'bg-gray-800 border-gray-700' 
+        ? 'bg-black border-zinc-800' 
         : 'bg-white border-gray-200'
     }`}>
       {/* Logo/Brand */}
@@ -180,7 +180,7 @@ export default function Sidebar() {
         </nav>
         
         {/* Account Section */}
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-zinc-700">
           <h3 className="px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
             Account
           </h3>
@@ -209,7 +209,7 @@ export default function Sidebar() {
       
       {/* User Profile */}
       <div className={`p-4 border-t ${
-        theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        theme === 'dark' ? 'border-zinc-700' : 'border-gray-200'
       }`}>
         {user && (
           <div className="flex items-center">

@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/DashboardNew';
+import AdminDashboard from './pages/AdminDashboard';
 import TasksPage from './pages/TasksPage';
 import TaskDetailPage from './pages/TaskDetailPage';
 import MessagingPage from './pages/MessagingPage';
@@ -42,6 +43,12 @@ function ProtectedPublicRoute({ children }) {
   return token ? <Navigate to="/dashboard" replace /> : children;
 }
 
+// Dashboard route component that renders different dashboards based on user role
+function DashboardRoute() {
+  const { user } = useAuth();
+  return user?.role?.name === 'Admin' ? <AdminDashboard /> : <Dashboard />;
+}
+
 const App = () => (
   <AuthProvider>
     <ThemeProvider>
@@ -59,7 +66,7 @@ const App = () => (
 
         {/* Protected routes with layout */}
         <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardRoute />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
           <Route path="/messages" element={<MessagingPage />} />

@@ -12,6 +12,36 @@ export default function Signup() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState({ code: "+254", flag: "🇰🇪", name: "Kenya" });
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  
+  const countries = [
+    { code: "+254", flag: "🇰🇪", name: "Kenya" },
+    { code: "+1", flag: "🇺🇸", name: "United States" },
+    { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
+    { code: "+234", flag: "🇳🇬", name: "Nigeria" },
+    { code: "+27", flag: "🇿🇦", name: "South Africa" },
+    { code: "+256", flag: "🇺🇬", name: "Uganda" },
+    { code: "+255", flag: "🇹🇿", name: "Tanzania" },
+    { code: "+250", flag: "🇷🇼", name: "Rwanda" },
+    { code: "+91", flag: "🇮🇳", name: "India" },
+    { code: "+86", flag: "🇨🇳", name: "China" },
+    { code: "+33", flag: "🇫🇷", name: "France" },
+    { code: "+49", flag: "🇩🇪", name: "Germany" },
+    { code: "+39", flag: "🇮🇹", name: "Italy" },
+    { code: "+34", flag: "🇪🇸", name: "Spain" },
+    { code: "+81", flag: "🇯🇵", name: "Japan" },
+    { code: "+82", flag: "🇰🇷", name: "South Korea" },
+    { code: "+61", flag: "🇦🇺", name: "Australia" },
+    { code: "+55", flag: "🇧🇷", name: "Brazil" },
+    { code: "+52", flag: "🇲🇽", name: "Mexico" },
+    { code: "+7", flag: "🇷🇺", name: "Russia" },
+    { code: "+20", flag: "🇪🇬", name: "Egypt" },
+    { code: "+212", flag: "🇲🇦", name: "Morocco" },
+    { code: "+233", flag: "🇬🇭", name: "Ghana" },
+    { code: "+251", flag: "🇪🇹", name: "Ethiopia" },
+    { code: "+260", flag: "🇿🇲", name: "Zambia" }
+  ];
   const [departmentId, setDepartmentId] = useState("");
   const [departments, setDepartments] = useState([]);
   const [password, setPassword] = useState("");
@@ -33,6 +63,16 @@ export default function Signup() {
       setPasswordMatch(false);
     }
   }, [password, confirmPassword]);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCountryDropdown && !event.target.closest('.country-selector')) {
+        setShowCountryDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCountryDropdown]);
 
   useEffect(() => {
     // Load departments on component mount
@@ -83,7 +123,7 @@ export default function Signup() {
           first_name: firstName,
           last_name: lastName,
           email,
-          phone_number: phoneNumber,
+          phone_number: selectedCountry.code + phoneNumber,
           department_id: parseInt(departmentId),
           password,
           password_confirmation: confirmPassword,
@@ -137,22 +177,22 @@ export default function Signup() {
 
   return (
     <div className={`min-h-screen flex items-stretch transition-colors ${
-      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
+      theme === 'dark' ? 'bg-black' : 'bg-gray-100'
     }`} style={{ backgroundImage: `url(${salahImage})`, backgroundSize: "cover", backgroundPosition: "center" }}>
       <div className={`absolute inset-0 z-0 ${
         theme === 'dark' ? 'bg-black/70' : 'bg-black/50'
       }`}></div>
       
-      <div className="w-full md:w-1/2 p-8 flex items-center justify-start z-10">
-        <form onSubmit={handleSignup} className={`p-8 rounded-2xl shadow-xl w-full max-w-md transition-colors ${
+      <div className="w-full md:w-1/2 p-4 sm:p-6 lg:p-8 flex items-center justify-center z-10">
+        <form onSubmit={handleSignup} className={`p-4 sm:p-6 lg:p-8 rounded-2xl shadow-xl w-full max-w-sm sm:max-w-md transition-colors ${
           theme === 'dark'
-            ? 'bg-gray-800/95 backdrop-blur-md border border-gray-700'
+            ? 'bg-black/95 backdrop-blur-md border border-zinc-700'
             : 'bg-white/95 backdrop-blur-md'
         }`}>
-          <h1 className={`text-2xl font-bold text-center mb-2 ${
+          <h1 className={`text-xl sm:text-2xl font-bold text-center mb-2 ${
             theme === 'dark' ? 'text-white' : 'text-gray-800'
           }`}>Create an Account</h1>
-          <p className={`text-sm text-center mb-6 ${
+          <p className={`text-xs sm:text-sm text-center mb-4 sm:mb-6 ${
             theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
           }`}>
             Please create an account using your official names. The name you enter here will appear on your certificate upon completion.
@@ -216,12 +256,12 @@ export default function Signup() {
               <input
                 id="subscribe_emails"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 rounded border-2 border-gray-400 bg-white text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer checked:bg-blue-600 checked:border-blue-600 hover:checked:bg-blue-600 hover:checked:border-blue-600"
                 checked={subscribeEmails}
                 onChange={(e) => setSubscribeEmails(e.target.checked)}
               />
-              <label htmlFor="subscribe_emails" className={`ml-2 text-sm ${
-                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              <label htmlFor="subscribe_emails" className={`ml-2 text-sm cursor-pointer font-medium ${
+                theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
               }`}>
                 I confirm my subscription to receive program-related emails.
               </label>
@@ -232,18 +272,62 @@ export default function Signup() {
             <label className={`block text-sm font-medium mb-1 ${
               theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
             }`}>Phone Number</label>
-            <input
-              type="tel"
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                theme === 'dark'
-                  ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
-              placeholder="+254 700 000 000"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-            />
+            <div className="flex country-selector">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                  className={`flex items-center px-2 sm:px-3 py-2 text-sm border rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                    theme === 'dark'
+                      ? 'border-gray-600 bg-gray-700 text-white'
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <span className="mr-2 text-lg">{selectedCountry.flag}</span>
+                  <span className="mr-1">{selectedCountry.code}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showCountryDropdown && (
+                  <div className={`absolute top-full left-0 z-10 w-full sm:w-64 border rounded-md shadow-lg max-h-48 sm:max-h-60 overflow-y-auto ${
+                    theme === 'dark'
+                      ? 'border-gray-600 bg-gray-700'
+                      : 'border-gray-300 bg-white'
+                  }`}>
+                    {countries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCountry(country);
+                          setShowCountryDropdown(false);
+                        }}
+                        className={`w-full flex items-center px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
+                        }`}
+                      >
+                        <span className="mr-3 text-lg">{country.flag}</span>
+                        <span className="mr-2">{country.code}</span>
+                        <span className="text-sm">{country.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <input
+                type="tel"
+                className={`flex-1 border rounded-r px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                  theme === 'dark'
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                }`}
+                placeholder="700 000 000"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
           </div>
           
           <div className="mb-4">
@@ -354,7 +438,7 @@ export default function Signup() {
             <input
               id="terms"
               type="checkbox"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-5 w-5 rounded border-2 border-gray-400 bg-white text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer checked:bg-blue-600 checked:border-blue-600 hover:checked:bg-blue-600 hover:checked:border-blue-600"
               checked={agreeTerms}
               onChange={(e) => setAgreeTerms(e.target.checked)}
               required

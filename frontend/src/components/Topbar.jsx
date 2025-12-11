@@ -241,12 +241,20 @@ export default function Topbar({ onMenuToggle }) {
   };
 
   return (
-    <div className="sticky top-0 z-10 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex items-center justify-between px-6 py-3 dark:bg-gray-800 dark:border-gray-700">
+    <div className={`sticky top-0 z-10 border-b transition-colors ${
+      theme === 'dark' 
+        ? 'bg-black border-zinc-800' 
+        : 'bg-white border-gray-200'
+    }`}>
+      <div className="flex items-center justify-between px-6 py-3">
         {/* Mobile menu button */}
         <button 
           onClick={onMenuToggle}
-          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 md:hidden"
+          className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 md:hidden transition-colors ${
+            theme === 'dark'
+              ? 'text-gray-400 hover:bg-zinc-800 hover:text-white'
+              : 'text-gray-500 hover:bg-gray-100'
+          }`}
           aria-label="Toggle menu"
         >
           <BsList className="h-6 w-6" />
@@ -261,7 +269,11 @@ export default function Topbar({ onMenuToggle }) {
             <input
               type="text"
               placeholder="Search tasks, messages, or users..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className={`block w-full pl-10 pr-3 py-2 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors ${
+                theme === 'dark'
+                  ? 'border-zinc-700 bg-zinc-900 placeholder-gray-400 text-white'
+                  : 'border-gray-300 bg-white placeholder-gray-500 text-gray-900'
+              }`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -269,7 +281,11 @@ export default function Topbar({ onMenuToggle }) {
           
           {/* Search Results Dropdown */}
           {searchResults && (
-            <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50">
+            <div className={`absolute top-full mt-2 w-full rounded-lg shadow-lg border max-h-96 overflow-y-auto z-50 transition-colors ${
+              theme === 'dark'
+                ? 'bg-zinc-900 border-zinc-700'
+                : 'bg-white border-gray-200'
+            }`}>
               {isSearching ? (
                 <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   Searching...
@@ -404,7 +420,11 @@ export default function Topbar({ onMenuToggle }) {
           {/* Theme Toggle */}
           <button 
             onClick={toggleTheme}
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className={`p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-zinc-800'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? (
@@ -417,7 +437,11 @@ export default function Topbar({ onMenuToggle }) {
           {/* Messages */}
           <button 
             onClick={() => navigate('/messages')}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+            className={`p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative transition-colors ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-zinc-800'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
           >
             <BsChatSquareText className="h-5 w-5" />
             <span className="sr-only">Messages</span>
@@ -425,7 +449,11 @@ export default function Topbar({ onMenuToggle }) {
           
           {/* Notifications */}
           <button 
-            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative"
+            className={`p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 relative transition-colors ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-zinc-800'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
             onClick={() => navigate('/messages')}
             title={`${notificationCount} unread message${notificationCount !== 1 ? 's' : ''}`}
           >
@@ -477,7 +505,11 @@ export default function Topbar({ onMenuToggle }) {
               </button>
 
               {isProfileOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                <div className={`origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transition-colors ${
+                  theme === 'dark'
+                    ? 'bg-zinc-900'
+                    : 'bg-white'
+                }`}>
                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
                   {/* Profile Section */}
                   <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">

@@ -63,7 +63,7 @@ export default function HomePage() {
 
   return (
     <div className={`flex flex-col min-h-screen transition-colors ${
-      theme === 'dark' ? 'bg-gray-900' : 'bg-white'
+      theme === 'dark' ? 'bg-black' : 'bg-white'
     }`}>
 
       {/* Hero Section with Static Image */}
@@ -113,21 +113,21 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section id="features" className={`py-16 px-4 transition-colors ${
-        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        theme === 'dark' ? 'bg-black' : 'bg-white'
       }`}>
-        <div className="max-w-6xl mx-auto">
-          <h2 className={`text-3xl font-bold text-center mb-4 ${
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className={`text-2xl sm:text-3xl font-bold text-center mb-4 ${
             theme === 'dark' ? 'text-white' : 'text-gray-800'
           }`}>Streamline Your Department Communication</h2>
-          <p className={`text-lg text-center max-w-3xl mx-auto mb-12 ${
+          <p className={`text-sm sm:text-lg text-center max-w-3xl mx-auto mb-8 sm:mb-12 ${
             theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
           }`}>
             Our platform is specifically designed to address the communication challenges faced by companies like Volo Africa
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
             <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
-              theme === 'dark' ? 'bg-gray-700' : 'bg-orange-50'
+              theme === 'dark' ? 'bg-zinc-900' : 'bg-orange-50'
             }`}>
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
                 theme === 'dark' ? 'bg-orange-600' : 'bg-orange-100'
@@ -147,7 +147,7 @@ export default function HomePage() {
             </div>
             
             <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
-              theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'
+              theme === 'dark' ? 'bg-zinc-900' : 'bg-green-50'
             }`}>
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
                 theme === 'dark' ? 'bg-green-600' : 'bg-green-100'
@@ -167,7 +167,7 @@ export default function HomePage() {
             </div>
             
             <div className={`p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow ${
-              theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50'
+              theme === 'dark' ? 'bg-zinc-900' : 'bg-blue-50'
             }`}>
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
                 theme === 'dark' ? 'bg-blue-600' : 'bg-blue-100'
@@ -191,23 +191,23 @@ export default function HomePage() {
 
       {/* Stats Section */}
       <section className={`py-16 px-4 transition-colors ${
-        theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-black text-white'
+        theme === 'dark' ? 'bg-black text-white' : 'bg-black text-white'
       }`}>
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 text-center px-4">
           <div>
-            <p className="text-5xl font-bold text-orange-600 mb-2">89%</p>
+            <p className="text-3xl sm:text-5xl font-bold text-orange-600 mb-2">89%</p>
             <p className={`text-lg ${
               theme === 'dark' ? 'text-gray-100' : 'text-white'
             }`}>Increase in inter-department communication efficiency</p>
           </div>
           <div>
-            <p className="text-5xl font-bold text-orange-600 mb-2">42%</p>
+            <p className="text-3xl sm:text-5xl font-bold text-orange-600 mb-2">42%</p>
             <p className={`text-lg ${
               theme === 'dark' ? 'text-gray-100' : 'text-white'
             }`}>Reduction in task completion time</p>
           </div>
           <div>
-            <p className="text-5xl font-bold text-orange-600 mb-2">76%</p>
+            <p className="text-3xl sm:text-5xl font-bold text-orange-600 mb-2">76%</p>
             <p className={`text-lg ${
               theme === 'dark' ? 'text-gray-100' : 'text-white'
             }`}>Decrease in misallocated tasks</p>
@@ -239,8 +239,10 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer id="contact" className="bg-gray-800 text-white py-12 px-4">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
+      <footer id="contact" className={`py-12 px-4 ${
+        theme === 'dark' ? 'bg-black' : 'bg-gray-800'
+      } text-white`}>
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           <div>
             <h3 className="text-xl font-semibold mb-4 text-orange-500">VOLO</h3>
             <p className="text-gray-400">OWN THE JOURNEY, OWN THE PLATFORM.</p>
