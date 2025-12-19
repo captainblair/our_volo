@@ -135,29 +135,49 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Handle session expiry events
+  useEffect(() => {
+    const handleSessionExpired = (event) => {
+      console.log('Session expired event received:', event.detail?.message);
+      logout();
+      setError(event.detail?.message || 'Your session has expired. Please log in again.');
+    };
+
+    window.addEventListener('sessionExpired', handleSessionExpired);
+    return () => window.removeEventListener('sessionExpired', handleSessionExpired);
+  }, [logout]);
+
+  // Check token validity on page load/refresh
+  useEffect(() => {
+    const checkTokenOnLoad = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken && !token) {
+        const isValid = await validateToken(storedToken);
+        if (isValid) {
+          setToken(storedToken);
+          api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+        } else {
+          // Try refresh token
+          const newToken = await refreshToken();
+          if (!newToken) {
+            logout();
+            setError('Your session has expired. Please log in again.');
+          }
+        }
+      } else if (!storedToken) {
+        setLoading(false);
+      }
+    };
+
+    checkTokenOnLoad();
+  }, []);
+
   // Fetch user data when token changes
   useEffect(() => {
     let isMounted = true;
     
     const fetchUserData = async () => {
       if (!token) {
-        // Check for token in localStorage if not in state
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
-          const isValid = await validateToken(storedToken);
-          if (isValid) {
-            setToken(storedToken);
-            api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-            return; // Will trigger the effect again with the new token
-          } else {
-            // Try to refresh the token
-            const newToken = await refreshToken();
-            if (newToken) {
-              setToken(newToken);
-              return; // Will trigger the effect again with the new token
-            }
-          }
-        }
         if (isMounted) setLoading(false);
         return;
       }
@@ -198,15 +218,10 @@ export function AuthProvider({ children }) {
       } catch (err) {
         console.error('Error fetching user data:', err);
         if (isMounted) {
-          if (err.response?.status === 401) {
-            // Try to refresh token on 401
-            const newToken = await refreshToken();
-            if (newToken) {
-              setToken(newToken);
-              return;
-            }
+          // Don't handle 401 here as it's handled by the interceptor
+          if (err.response?.status !== 401) {
+            setError('Failed to load user data. Please try again.');
           }
-          setError('Failed to load user data. Please log in again.');
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -218,7 +233,7 @@ export function AuthProvider({ children }) {
     return () => {
       isMounted = false;
     };
-  }, [token, validateToken, refreshToken]);
+  }, [token]);
 
   /**
    * Login user with email and password

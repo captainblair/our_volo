@@ -23,13 +23,27 @@ import ReportsPage from './pages/ReportsPage';
 // Components
 import Layout from './components/Layout';
 import PublicLayout from './components/PublicLayout';
+import ToastContainer from './components/ToastContainer';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 
 // PrivateRoute Component for protecting routes
 function PrivateRoute() {
-  const { token } = useAuth();
-  return token ? <Layout><Outlet /></Layout> : <Navigate to="/login" replace />;
+  const { token, loading, error } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <Layout><Outlet /></Layout>;
 }
 
 // Public route component
@@ -53,40 +67,41 @@ const App = () => (
   <AuthProvider>
     <ThemeProvider>
       <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<ProtectedPublicRoute><Login /></ProtectedPublicRoute>} />
-          <Route path="/signup" element={<ProtectedPublicRoute><Signup /></ProtectedPublicRoute>} />
-          <Route path="/" element={<ProtectedPublicRoute><HomePage /></ProtectedPublicRoute>} />
-          <Route path="/about" element={<div className="container mx-auto p-4">About Us Page</div>} />
-          <Route path="/features" element={<div className="container mx-auto p-4">Features Page</div>} />
-          <Route path="/pricing" element={<div className="container mx-auto p-4">Pricing Page</div>} />
-        </Route>
+        <ToastContainer />
+        <Routes>
+          {/* Public routes */}
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<ProtectedPublicRoute><Login /></ProtectedPublicRoute>} />
+            <Route path="/signup" element={<ProtectedPublicRoute><Signup /></ProtectedPublicRoute>} />
+            <Route path="/" element={<ProtectedPublicRoute><HomePage /></ProtectedPublicRoute>} />
+            <Route path="/about" element={<div className="container mx-auto p-4">About Us Page</div>} />
+            <Route path="/features" element={<div className="container mx-auto p-4">Features Page</div>} />
+            <Route path="/pricing" element={<div className="container mx-auto p-4">Pricing Page</div>} />
+          </Route>
 
-        {/* Protected routes with layout */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<DashboardRoute />} />
-          <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
-          <Route path="/messages" element={<MessagingPage />} />
-          <Route path="/messages/:id" element={<MessagingPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          
-          {/* Feature pages */}
-          <Route path="/departments" element={<DepartmentsPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          
-          {/* Admin routes */}
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/*" element={<AdminPage />} />
-        </Route>
+          {/* Protected routes with layout */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<DashboardRoute />} />
+            <Route path="/tasks" element={<TasksPage />} />
+            <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
+            <Route path="/messages" element={<MessagingPage />} />
+            <Route path="/messages/:id" element={<MessagingPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            
+            {/* Feature pages */}
+            <Route path="/departments" element={<DepartmentsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            
+            {/* Admin routes */}
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/*" element={<AdminPage />} />
+          </Route>
 
-        {/* 404 - Not Found */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* 404 - Not Found */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   </AuthProvider>

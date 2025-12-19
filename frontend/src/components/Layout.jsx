@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import SessionTimeoutModal from './SessionTimeoutModal';
+import usePageVisibility from '../hooks/usePageVisibility';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme } = useTheme();
   const location = useLocation();
+  
+  // Handle page visibility changes for token validation
+  usePageVisibility();
 
   // Close mobile sidebar when route changes
   useEffect(() => {
@@ -18,6 +23,9 @@ export default function Layout() {
     <div className={`min-h-screen transition-colors duration-200 ${
       theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
     }`}>
+      {/* Session timeout modal */}
+      <SessionTimeoutModal />
+      
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
         sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
