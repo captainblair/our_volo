@@ -135,6 +135,28 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  /**
+   * Logout the current user
+   */
+  const logout = useCallback(() => {
+    // Clear tokens from storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('rememberedEmail');
+    localStorage.removeItem('rememberMe');
+    
+    // Clear auth header
+    delete api.defaults.headers.common['Authorization'];
+    
+    // Reset state
+    setToken(null);
+    setUser(null);
+    setError(null);
+    setUserRoles([]);
+    setUserDepartments([]);
+    setPermissions({});
+  }, []);
+
   // Handle session expiry events
   useEffect(() => {
     const handleSessionExpired = (event) => {
@@ -170,7 +192,7 @@ export function AuthProvider({ children }) {
     };
 
     checkTokenOnLoad();
-  }, []);
+  }, [validateToken, refreshToken, logout, token]);
 
   // Fetch user data when token changes
   useEffect(() => {
@@ -331,28 +353,6 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   };
-
-  /**
-   * Logout the current user
-   */
-  const logout = useCallback(() => {
-    // Clear tokens from storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('rememberedEmail');
-    localStorage.removeItem('rememberMe');
-    
-    // Clear auth header
-    delete api.defaults.headers.common['Authorization'];
-    
-    // Reset state
-    setToken(null);
-    setUser(null);
-    setError(null);
-    setUserRoles([]);
-    setUserDepartments([]);
-    setPermissions({});
-  }, []);
 
   /**
    * Update user data in the context
