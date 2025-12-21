@@ -56,9 +56,59 @@ export default function Login() {
 
   const toggleShowPassword = () => setShowPassword(!showPassword);
 
-  const handleGoogleLogin = () => {
-    alert('Google login integration coming soon! Please use email/password for now.');
+  const handleGoogleLogin = async (response) => {
+    try {
+      setLoading(true);
+      setError("");
+      
+      const result = await fetch('http://localhost:8000/api/users/google-auth/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          credential: response.credential
+        })
+      });
+      
+      const data = await result.json();
+      
+      if (result.ok) {
+        // Store tokens
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
+        
+        // Set auth header
+        const api = (await import('../services/api')).default;
+        api.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
+        
+        navigate('/dashboard');
+      } else {
+        setError(data.error || 'Google login failed');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      setError('Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+  
+  const handleGoogleError = () => {
+    setError('Google login was cancelled or failed.');
+  };
+  
+  // Initialize Google Sign-In
+  React.useEffect(() => {
+    if (window.google) {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com';
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleLogin,
+        auto_select: false,
+      });
+    }
+  }, []);
 
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 py-6 sm:py-8 transition-colors ${
@@ -162,18 +212,26 @@ export default function Login() {
               </div>
             </div>
             {/* Google Login Button */}
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className={`w-full mb-3 py-2 px-3 sm:px-4 text-sm sm:text-base border rounded-lg transition-colors flex items-center justify-center space-x-2 ${
-                theme === 'dark'
-                  ? 'border-zinc-600 bg-zinc-800 text-white hover:bg-zinc-700'
-                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <FcGoogle className="h-5 w-5" />
-              <span>Continue with Google</span>
-            </button>
+            <div id="google-signin-button" className="w-full mb-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.google) {
+                    window.google.accounts.id.prompt();
+                  } else {
+                    setError('Google Sign-In not loaded. Please refresh the page.');
+                  }
+                }}
+                className={`w-full py-2 px-3 sm:px-4 text-sm sm:text-base border rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+                  theme === 'dark'
+                    ? 'border-zinc-600 bg-zinc-800 text-white hover:bg-zinc-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <FcGoogle className="h-5 w-5" />
+                <span>Continue with Google</span>
+              </button>
+            </div>
             
             {/* Divider */}
             <div className="relative mb-4">
