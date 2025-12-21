@@ -6,7 +6,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from apps.departments.models import Department
 
 User = get_user_model()
 
@@ -45,16 +44,6 @@ def google_auth(request):
                 'is_active': True,
             }
         )
-        
-        # If user is new, assign to default department
-        if created:
-            try:
-                default_dept = Department.objects.first()  # Get any department
-                if default_dept:
-                    user.department = default_dept
-                    user.save()
-            except Exception:
-                pass
         
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
