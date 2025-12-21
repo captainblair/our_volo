@@ -13,23 +13,20 @@ User = get_user_model()
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def google_auth(request):
-    """
-    Authenticate user with Google OAuth token
-    """
     try:
-        token = request.data.get('token')
-        if not token:
-            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        credential = request.data.get('credential')
+        if not credential:
+            return Response({'error': 'Google credential is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verify Google token
-        google_response = requests.get(
-            f'https://www.googleapis.com/oauth2/v1/userinfo?access_token={token}'
+        # Verify Google ID token
+        response = requests.get(
+            f'https://oauth2.googleapis.com/tokeninfo?id_token={credential}'
         )
         
-        if google_response.status_code != 200:
-            return Response({'error': 'Invalid Google token'}, status=status.HTTP_400_BAD_REQUEST)
+        if response.status_code != 200:
+            return Response({'error': 'Invalid Google credential'}, status=status.HTTP_400_BAD_REQUEST)
         
-        google_data = google_response.json()
+        google_data = response.json()
         
         # Extract user info
         email = google_data.get('email')
@@ -52,10 +49,11 @@ def google_auth(request):
         # If user is new, assign to default department
         if created:
             try:
-                default_dept = Department.objects.get(name='IT')  # or any default department
-                user.department = default_dept
-                user.save()
-            except Department.DoesNotExist:
+                default_dept = Department.objects.first()  # Get any department
+                if default_dept:
+                    user.department = default_dept
+                    user.save()
+            except Exception:
                 pass
         
         # Generate JWT tokens
@@ -64,14 +62,6 @@ def google_auth(request):
         return Response({
             'access': str(refresh.access_token),
             'refresh': str(refresh),
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'department': user.department.name if user.department else None,
-                'role': user.role.name if user.role else 'staff'
-            }
         })
         
     except Exception as e:
